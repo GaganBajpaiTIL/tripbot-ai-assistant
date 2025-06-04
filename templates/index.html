@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripBot - Your AI Travel Assistant</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-plane-departure me-2"></i>
+                TripBot
+            </a>
+            <div class="navbar-nav ms-auto">
+                <button class="btn btn-outline-light btn-sm" onclick="resetChat()">
+                    <i class="fas fa-refresh me-1"></i>
+                    New Chat
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <!-- Chat Interface -->
+            <div class="col-lg-8 col-md-12 h-100 d-flex flex-column">
+                <div class="chat-container flex-grow-1 d-flex flex-column">
+                    <!-- Chat Header -->
+                    <div class="chat-header p-3 border-bottom">
+                        <h5 class="mb-1">
+                            <i class="fas fa-robot text-primary me-2"></i>
+                            Your AI Travel Assistant
+                        </h5>
+                        <small class="text-muted">Let's plan your perfect trip together!</small>
+                    </div>
+
+                    <!-- Chat Messages -->
+                    <div class="chat-messages flex-grow-1 p-3" id="chatMessages">
+                        <!-- Welcome message -->
+                        <div class="message bot-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-bubble">
+                                    <p class="mb-0">
+                                        Hello! I'm TripBot, your personal travel assistant. I'm here to help you plan the perfect trip! 
+                                        To get started, could you please tell me your name?
+                                    </p>
+                                </div>
+                                <small class="message-time text-muted">Just now</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Typing Indicator -->
+                    <div class="typing-indicator p-3" id="typingIndicator" style="display: none;">
+                        <div class="message bot-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="typing-dots">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="chat-input p-3 border-top">
+                        <form id="chatForm" class="d-flex gap-2">
+                            <input type="text" 
+                                   id="messageInput" 
+                                   class="form-control" 
+                                   placeholder="Type your message here..."
+                                   autocomplete="off"
+                                   maxlength="500">
+                            <button type="submit" class="btn btn-primary" id="sendButton">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4 col-md-12 border-start bg-light">
+                <div class="sidebar p-3">
+                    <!-- Trip Progress -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-list-check me-2"></i>
+                                Trip Planning Progress
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="progress-steps" id="progressSteps">
+                                <div class="step" data-step="greeting">
+                                    <i class="fas fa-user"></i>
+                                    <span>Welcome</span>
+                                </div>
+                                <div class="step" data-step="name_collection">
+                                    <i class="fas fa-id-card"></i>
+                                    <span>Name</span>
+                                </div>
+                                <div class="step" data-step="email_collection">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Email</span>
+                                </div>
+                                <div class="step" data-step="destination_collection">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Destination</span>
+                                </div>
+                                <div class="step" data-step="date_collection">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Dates</span>
+                                </div>
+                                <div class="step" data-step="confirmation">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Confirmation</span>
+                                </div>
+                                <div class="step" data-step="final_confirmation">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    <span>Booking</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Collected Information -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Trip Information
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="collectedInfo">
+                                <p class="text-muted mb-0">Information will appear here as we chat...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cost Breakdown -->
+                    <div class="card" id="costBreakdownCard" style="display: none;">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-dollar-sign me-2"></i>
+                                Cost Breakdown
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="costBreakdown">
+                                <!-- Cost details will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+</body>
+</html>
+
