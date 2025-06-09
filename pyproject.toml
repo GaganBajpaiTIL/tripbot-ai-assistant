@@ -1,9 +1,14 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "repl-nix-workspace"
+name = "tripbot"
 version = "0.1.0"
-description = "Add your description here"
-requires-python = ">=3.11"
+description = "Trip planning chatbot with conversational interface, booking system, and LLM integration using Flask and vanilla JavaScript."
+requires-python = ">=3.12"
 dependencies = [
+    "boto3>=1.34.0",
     "email-validator>=2.2.0",
     "flask>=3.1.1",
     "flask-sqlalchemy>=3.1.1",
@@ -15,3 +20,16 @@ dependencies = [
     "werkzeug>=3.1.3",
 ]
 
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["tripbot"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "flake8",
+]

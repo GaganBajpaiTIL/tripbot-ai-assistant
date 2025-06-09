@@ -5,7 +5,7 @@ An interactive trip planning chatbot with conversational interface, booking syst
 ## Features
 
 - **ChatGPT-like Interface**: Natural conversation flow for trip planning
-- **AI-Powered**: Supports both OpenAI GPT-4o and Google Gemini models
+- **AI-Powered**: Supports OpenAI GPT-4o, Google Gemini, and AWS Bedrock Llama models
 - **Complete Booking System**: Cost calculations, booking management, and mock payment processing
 - **Real-time Progress Tracking**: Visual progress indicators and trip information display
 - **Responsive Design**: Works on desktop and mobile devices
@@ -37,7 +37,7 @@ The application features a modern dark theme with:
 
 2. **Install dependencies**
    ```bash
-   pip install -r requirements.txt
+   pip install -r pyproject.toml
    ```
    
    Or if using the project file:
@@ -52,6 +52,10 @@ The application features a modern dark theme with:
    OPENAI_API_KEY=sk-your-openai-key-here
    # OR
    GEMINI_API_KEY=your-gemini-key-here
+   # OR
+   AWS_ACCESS_KEY_ID=your-aws-access-key
+   AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+   AWS_DEFAULT_REGION=us-east-1
    
    # Optional: Database and session configuration
    DATABASE_URL=sqlite:///trip_planner.db
@@ -85,6 +89,16 @@ The application features a modern dark theme with:
 2. Sign in with your Google account
 3. Create a new API key
 4. Copy the key for use
+
+### AWS Bedrock Configuration
+1. Go to [AWS Console](https://console.aws.amazon.com/iam/)
+2. Create an IAM user with Bedrock access permissions
+3. Generate access keys for the user
+4. Set the following environment variables:
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY` 
+   - `AWS_DEFAULT_REGION` (e.g., us-east-1)
+5. Ensure Bedrock access is enabled in your AWS region
 
 ## Project Structure
 
@@ -134,7 +148,8 @@ The application features a modern dark theme with:
 The application uses adapters to support multiple AI services:
 - **OpenAI Adapter**: Uses GPT-4o for natural conversations
 - **Gemini Adapter**: Google's Gemini Pro for trip planning
-- **Fallback System**: Gracefully handles API failures
+- **Bedrock Adapter**: AWS Bedrock with Llama models for trip planning
+- **Fallback System**: Gracefully handles API failures and switches between services
 
 ## API Endpoints
 
@@ -155,10 +170,13 @@ The application uses adapters to support multiple AI services:
 |----------|----------|-------------|
 | `OPENAI_API_KEY` | Optional* | OpenAI API key for GPT-4o |
 | `GEMINI_API_KEY` | Optional* | Google Gemini API key |
+| `AWS_ACCESS_KEY_ID` | Optional* | AWS access key for Bedrock |
+| `AWS_SECRET_ACCESS_KEY` | Optional* | AWS secret key for Bedrock |
+| `AWS_DEFAULT_REGION` | No | AWS region (default: us-east-1) |
 | `DATABASE_URL` | No | Database connection string (default: SQLite) |
 | `SESSION_SECRET` | No | Secret key for session management |
 
-*At least one AI service API key is required
+*At least one AI service configuration is required
 
 ### Database Configuration
 

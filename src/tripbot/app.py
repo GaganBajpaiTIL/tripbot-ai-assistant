@@ -14,7 +14,13 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 # Create the app
-app = Flask(__name__)
+# Correctly determine the project root relative to app.py
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+app = Flask(__name__,
+            template_folder=os.path.join(project_root, 'templates'),
+            static_folder=os.path.join(project_root, 'static'))
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
@@ -37,5 +43,5 @@ with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=50001, debug=True)
 

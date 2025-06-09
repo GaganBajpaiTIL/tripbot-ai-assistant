@@ -10,7 +10,7 @@ from booking_service import BookingService
 logger = logging.getLogger(__name__)
 
 # Initialize services
-trip_bot = TripPlannerBot(preferred_llm="openai")  # Can be changed to "gemini"
+trip_bot = TripPlannerBot(preferred_llm="openai")  # Can be changed to "gemini" or "bedrock"
 booking_service = BookingService()
 
 @app.route('/')
@@ -230,4 +230,3 @@ def not_found(error):
 @app.errorhandler(500)
 def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
-

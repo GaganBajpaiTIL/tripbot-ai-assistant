@@ -4,6 +4,8 @@ import logging
 from typing import Dict, Any, Optional
 import google.generativeai as genai
 from openai import OpenAI
+import boto3
+from botocore.exceptions import ClientError, NoCredentialsError
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +91,72 @@ class GeminiAdapter(LLMAdapter):
             logger.error(f"Gemini API error: {e}")
             return "I apologize, but I'm experiencing some technical difficulties. Please try again in a moment."
 
+class BedrockLlamaAdapter(LLMAdapter):
+    """AWS Bedrock Llama adapter for conversational trip planning"""
+    
+    def __init__(self):
+        self.aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
+        self.aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+        self.aws_region = os.environ.get("AWS_DEFAULT_REGION", "us-east-1")
+        
+        if not self.aws_access_key or not self.aws_secret_key:
+            logger.warning("AWS credentials not found")
+            self.client = None
+        else:
+            try:
+                self.client = boto3.client(
+                    'bedrock-runtime',
+                    aws_access_key_id=self.aws_access_key,
+                    aws_secret_access_key=self.aws_secret_key,
+                    region_name=self.aws_region
+                )
+                # Test the connection
+                self.client.list_foundation_models()
+            except (ClientError, NoCredentialsError) as e:
+                logger.warning(f"AWS Bedrock connection failed: {e}")
+                self.client = None
+    
+    def generate_response(self, messages: list, system_prompt: str = None) -> str:
+        """Generate response using AWS Bedrock Llama models"""
+        if not self.client:
+            return "I'm sorry, but I'm having trouble connecting to my language processing service. Please try again later."
+        
+        try:
+            # Convert messages to Llama format
+            conversation_text = ""
+            if system_prompt:
+                conversation_text += f"System: {system_prompt}\n\n"
+            
+            for message in messages:
+                role = "Human" if message["role"] == "user" else "Assistant"
+                conversation_text += f"{role}: {message['content']}\n"
+            
+            conversation_text += "Assistant: "
+            
+            # Prepare request for Llama 2 model
+            model_id = "meta.llama2-70b-chat-v1"  # You can change this to other Llama variants
+            
+            body = json.dumps({
+                "prompt": conversation_text,
+                "max_gen_len": 500,
+                "temperature": 0.7,
+                "top_p": 0.9
+            })
+            
+            response = self.client.invoke_model(
+                modelId=model_id,
+                body=body,
+                contentType='application/json',
+                accept='application/json'
+            )
+            
+            response_body = json.loads(response['body'].read())
+            return response_body.get('generation', 'Sorry, I could not generate a response.')
+            
+        except Exception as e:
+            logger.error(f"Bedrock Llama API error: {e}")
+            return "I apologize, but I'm experiencing some technical difficulties. Please try again in a moment."
+
 class TripPlannerBot:
     """Main trip planner bot with conversation management"""
     
@@ -96,6 +164,7 @@ class TripPlannerBot:
         self.preferred_llm = preferred_llm
         self.openai_adapter = OpenAIAdapter()
         self.gemini_adapter = GeminiAdapter()
+        self.bedrock_adapter = BedrockLlamaAdapter()
         
         # Conversation flow steps
         self.conversation_steps = [
@@ -143,10 +212,14 @@ Once you have all information, summarize the trip details and ask for confirmati
         """Get the appropriate LLM adapter"""
         if self.preferred_llm == "gemini" and self.gemini_adapter.model:
             return self.gemini_adapter
+        elif self.preferred_llm == "bedrock" and self.bedrock_adapter.client:
+            return self.bedrock_adapter
         elif self.openai_adapter.client:
             return self.openai_adapter
         elif self.gemini_adapter.model:
             return self.gemini_adapter
+        elif self.bedrock_adapter.client:
+            return self.bedrock_adapter
         else:
             return None
     
@@ -235,4 +308,3 @@ Once you have all information, summarize the trip details and ask for confirmati
         
         # Stay on current step if conditions not met
         return current_step
-
