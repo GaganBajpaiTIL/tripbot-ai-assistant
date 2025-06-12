@@ -32,12 +32,6 @@ resource "null_resource" "log" {
   provisioner "local-exec" {
     command     = self.triggers.log_entry
     interpreter = ["bash", "-c"]
-    
-    dynamic "when" {
-      for_each = each.value.when != null ? [1] : []
-      content {
-        destroy = each.value.when == "destroy"
-      }
-    }
+    when        = each.value.when == "destroy" ? "destroy" : "create"
   }
 }

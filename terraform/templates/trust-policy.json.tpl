@@ -4,7 +4,24 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::${account_id}:root"
+        "AWS": "arn:aws:iam::${YOUR_AWS_ACCOUNT_ID_PLACEHOLDER}:user/${IAM_USER_NAME_PLACEHOLDER}"
+      },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+          "Bool": {
+              "aws:ViaAWSService": "false"
+          }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com",
+          "eks.amazonaws.com",
+          "ecs-tasks.amazonaws.com",
+          "ecr.amazonaws.com"
+        ]
       },
       "Action": "sts:AssumeRole"
     }
