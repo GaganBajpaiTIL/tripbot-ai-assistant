@@ -28,33 +28,38 @@ resource "aws_iam_role" "bedrock_access" {
   }
 }
 
-# IAM Role logging
-module "role_logging" {
+# IAM Role logging - Creation
+module "role_creation_logging" {
   source = "./modules/logging"
-  
-  for_each = {
-    creation = {
-      log_message   = "IAM Role created"
-      resource_type = "aws_iam_role"
-      resource_name = aws_iam_role.bedrock_access.name
-      resource_id   = aws_iam_role.bedrock_access.id
-      resource_arn  = aws_iam_role.bedrock_access.arn
-    }
-    destruction = {
-      log_message   = "IAM Role destroyed"
-      resource_type = "aws_iam_role"
-      resource_name = aws_iam_role.bedrock_access.name
-      resource_id   = aws_iam_role.bedrock_access.id
-      resource_arn  = aws_iam_role.bedrock_access.arn
-      when          = "destroy"
-    }
+  enabled = true
+
+  log_attributes = {
+    log_message   = "IAM Role created"
+    resource_type = "aws_iam_role"
+    resource_name = aws_iam_role.bedrock_access.name
+    resource_id   = aws_iam_role.bedrock_access.id
+    resource_arn  = aws_iam_role.bedrock_access.arn
+    resource_attributes = jsonencode({
+      assume_role_policy = jsondecode(aws_iam_role.bedrock_access.assume_role_policy)
+    })
   }
-  
-  log_attributes = each.value
-  destroy        = each.key == "destruction"
-  resource_attributes = jsonencode({
-    assume_role_policy = jsondecode(aws_iam_role.bedrock_access.assume_role_policy)
-  })
+}
+
+# IAM Role logging - Destruction
+module "role_destruction_logging" {
+  source = "./modules/logging"
+  enabled = true
+
+  log_attributes = {
+    log_message   = "IAM Role destroyed"
+    resource_type = "aws_iam_role"
+    resource_name = aws_iam_role.bedrock_access.name
+    resource_id   = aws_iam_role.bedrock_access.id
+    resource_arn  = aws_iam_role.bedrock_access.arn
+    resource_attributes = jsonencode({
+      assume_role_policy = jsondecode(aws_iam_role.bedrock_access.assume_role_policy)
+    })
+  }
 }
 
 # Attach Bedrock Full Access policy to role
@@ -73,30 +78,34 @@ resource "aws_iam_user" "travel_bot" {
   }
 }
 
-# IAM User logging
-module "user_logging" {
+# IAM User logging - Creation
+module "user_creation_logging" {
   source = "./modules/logging"
-  
-  for_each = {
-    creation = {
-      log_message   = "IAM User created"
-      resource_type = "aws_iam_user"
-      resource_name = aws_iam_user.travel_bot.name
-      resource_id   = aws_iam_user.travel_bot.id
-      resource_arn  = aws_iam_user.travel_bot.arn
-    }
-    destruction = {
-      log_message   = "IAM User destroyed"
-      resource_type = "aws_iam_user"
-      resource_name = aws_iam_user.travel_bot.name
-      resource_id   = aws_iam_user.travel_bot.id
-      resource_arn  = aws_iam_user.travel_bot.arn
-      when          = "destroy"
-    }
+  enabled = true
+
+  log_attributes = {
+    log_message   = "IAM User created"
+    resource_type = "aws_iam_user"
+    resource_name = aws_iam_user.travel_bot.name
+    resource_id   = aws_iam_user.travel_bot.id
+    resource_arn  = aws_iam_user.travel_bot.arn
+    resource_attributes = jsonencode({})
   }
-  
-  log_attributes = each.value
-  destroy        = each.key == "destruction"
+}
+
+# IAM User logging - Destruction
+module "user_destruction_logging" {
+  source = "./modules/logging"
+  enabled = true
+
+  log_attributes = {
+    log_message   = "IAM User destroyed"
+    resource_type = "aws_iam_user"
+    resource_name = aws_iam_user.travel_bot.name
+    resource_id   = aws_iam_user.travel_bot.id
+    resource_arn  = aws_iam_user.travel_bot.arn
+    resource_attributes = jsonencode({})
+  }
 }
 
 # Create Access Keys
@@ -104,36 +113,44 @@ resource "aws_iam_access_key" "travel_bot" {
   user = aws_iam_user.travel_bot.name
 }
 
-# Access Key logging
-module "access_key_logging" {
+# Access Key logging - Creation
+module "access_key_creation_logging" {
   source = "./modules/logging"
-  
-  for_each = {
-    creation = {
-      log_message   = "Access Key created"
-      resource_type = "aws_iam_access_key"
-      resource_name = "Access Key for ${aws_iam_user.travel_bot.name}"
-      resource_id   = aws_iam_access_key.travel_bot.id
-      resource_arn  = "N/A"
-    }
-    destruction = {
-      log_message   = "Access Key destroyed"
-      resource_type = "aws_iam_access_key"
-      resource_name = "Access Key for ${aws_iam_user.travel_bot.name}"
-      resource_id   = aws_iam_access_key.travel_bot.id
-      resource_arn  = "N/A"
-      when          = "destroy"
-    }
+  enabled = true
+
+  log_attributes = {
+    log_message   = "Access Key created"
+    resource_type = "aws_iam_access_key"
+    resource_name = "Access Key for ${aws_iam_user.travel_bot.name}"
+    resource_id   = aws_iam_access_key.travel_bot.id
+    resource_arn  = "N/A"
+    resource_attributes = jsonencode({
+      user            = aws_iam_user.travel_bot.name
+      access_key_id   = aws_iam_access_key.travel_bot.id
+      secret_key      = aws_iam_access_key.travel_bot.encrypted_secret != "" ? "[REDACTED]" : null
+      status          = aws_iam_access_key.travel_bot.status
+    })
   }
-  
-  log_attributes = each.value
-  destroy        = each.key == "destruction"
-  resource_attributes = jsonencode({
-    user            = aws_iam_user.travel_bot.name
-    access_key_id   = aws_iam_access_key.travel_bot.id
-    secret_key      = aws_iam_access_key.travel_bot.encrypted_secret != "" ? "[REDACTED]" : null
-    status          = aws_iam_access_key.travel_bot.status
-  })
+}
+
+# Access Key logging - Destruction
+module "access_key_destruction_logging" {
+  source = "./modules/logging"
+  enabled = true
+
+  log_attributes = {
+    log_message   = "Access Key destroyed"
+    resource_type = "aws_iam_access_key"
+    resource_name = "Access Key for ${aws_iam_user.travel_bot.name}"
+    resource_id   = aws_iam_access_key.travel_bot.id
+    resource_arn  = "N/A"
+    resource_attributes = jsonencode({
+      user            = aws_iam_user.travel_bot.name
+      access_key_id   = aws_iam_access_key.travel_bot.id
+      secret_key      = "[REDACTED]"
+      status          = "destroyed"
+    })
+  }
 }
 
 # Attach Bedrock access policy to user
