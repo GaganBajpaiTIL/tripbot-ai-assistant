@@ -34,7 +34,8 @@ module "role_creation_logging" {
   enabled = true
 
   log_attributes = {
-    log_message   = "IAM Role created"
+    timestamp   = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    log_message = "IAM Role created"
     resource_type = "aws_iam_role"
     resource_name = aws_iam_role.bedrock_access.name
     resource_id   = aws_iam_role.bedrock_access.id
@@ -51,7 +52,8 @@ module "role_destruction_logging" {
   enabled = true
 
   log_attributes = {
-    log_message   = "IAM Role destroyed"
+    timestamp   = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    log_message = "IAM Role destroyed"
     resource_type = "aws_iam_role"
     resource_name = aws_iam_role.bedrock_access.name
     resource_id   = aws_iam_role.bedrock_access.id
@@ -84,7 +86,8 @@ module "user_creation_logging" {
   enabled = true
 
   log_attributes = {
-    log_message   = "IAM User created"
+    timestamp   = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    log_message = "IAM User created"
     resource_type = "aws_iam_user"
     resource_name = aws_iam_user.travel_bot.name
     resource_id   = aws_iam_user.travel_bot.id
@@ -99,7 +102,8 @@ module "user_destruction_logging" {
   enabled = true
 
   log_attributes = {
-    log_message   = "IAM User destroyed"
+    timestamp   = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    log_message = "IAM User destroyed"
     resource_type = "aws_iam_user"
     resource_name = aws_iam_user.travel_bot.name
     resource_id   = aws_iam_user.travel_bot.id
@@ -119,7 +123,8 @@ module "access_key_creation_logging" {
   enabled = true
 
   log_attributes = {
-    log_message   = "Access Key created"
+    timestamp   = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    log_message = "Access Key created"
     resource_type = "aws_iam_access_key"
     resource_name = "Access Key for ${aws_iam_user.travel_bot.name}"
     resource_id   = aws_iam_access_key.travel_bot.id
@@ -139,7 +144,8 @@ module "access_key_destruction_logging" {
   enabled = true
 
   log_attributes = {
-    log_message   = "Access Key destroyed"
+    timestamp   = formatdate("YYYY-MM-DD hh:mm:ss", timestamp())
+    log_message = "Access Key destroyed"
     resource_type = "aws_iam_access_key"
     resource_name = "Access Key for ${aws_iam_user.travel_bot.name}"
     resource_id   = aws_iam_access_key.travel_bot.id

@@ -13,7 +13,6 @@ variable "destroy" {
 variable "log_attributes" {
   description = "Log attributes to include in the log entry"
   type = object({
-    log_type           = string
     timestamp          = string
     log_message        = string
     resource_type      = string
