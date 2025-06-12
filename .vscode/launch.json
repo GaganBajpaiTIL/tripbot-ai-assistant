@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Gunicorn: Launch TripBot",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "${workspaceFolder}/venv/bin/python",
+            "module": "gunicorn",
+            "args": [
+                "tripbot.app:app",
+                "--config", "gunicorn.conf.py"
+            ],
+            "envFile": "${workspaceFolder}/.env.example",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYTHONUNBUFFERED": "1"
+            }
+        }
+    ]
+}

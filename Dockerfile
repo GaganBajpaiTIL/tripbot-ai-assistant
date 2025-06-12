@@ -1,8 +1,10 @@
 # command to build and run for dev understanding
 # # Build the Docker image
 # docker build -t tripbot .
-# docker run -p 50001:50001 --env-file .env tripbot
-#docker run -p 50001:50001 -e ENVIRONMENT=production --env-file .env tripbot
+# docker run -it -p50001:50001 --name tripbot"$RANDOM" tripbot
+# docker run -it -v $(pwd)/:/app -p50001:50001 --name tripbot"$RANDOM" tripbot
+# docker run -it --env-file .env.example -p50001:50001 --name tripbot"$RANDOM" tripbot
+# docker exec -it tripbot27037 /bin/bash
 # TODO: Set up Terraform for K8 leter. 
 # Use Python 3.12 slim as the base image
 FROM python:3.12-slim

@@ -161,10 +161,20 @@ class TripPlannerBot:
     """Main trip planner bot with conversation management"""
     
     def __init__(self, preferred_llm: str = "openai"):
-        self.preferred_llm = preferred_llm
-        self.openai_adapter = OpenAIAdapter()
-        self.gemini_adapter = GeminiAdapter()
-        self.bedrock_adapter = BedrockLlamaAdapter()
+        self.preferred_llm = preferred_llm.lower()
+        self.openai_adapter = None
+        self.gemini_adapter = None
+        self.bedrock_adapter = None
+        
+        # Initialize only the requested adapter
+        if self.preferred_llm == "openai":
+            self.openai_adapter = OpenAIAdapter()
+        elif self.preferred_llm == "gemini":
+            self.gemini_adapter = GeminiAdapter()
+        elif self.preferred_llm == "bedrock":
+            self.bedrock_adapter = BedrockLlamaAdapter()
+        else:
+            raise ValueError(f"Unsupported LLM provider: {preferred_llm}")
         
         # Conversation flow steps
         self.conversation_steps = [

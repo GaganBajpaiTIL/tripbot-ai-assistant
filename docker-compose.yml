@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "50001:50001"
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - .:/app
+    command: gunicorn app:app --bind 0.0.0.0:50001 --reload
+    env_file:
+      - .env

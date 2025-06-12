@@ -3,7 +3,7 @@ import json
 import logging
 from flask import render_template, request, jsonify, session
 from app import app, db
-from models import ChatSession, TripBooking
+from models import ChatSession
 from llm_adapters import TripPlannerBot
 from booking_service import BookingService
 

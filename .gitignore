@@ -150,7 +150,7 @@ ehthumbs.db
 Thumbs.db
 
 # IDE
-.vscode/
+#.vscode/
 *.swp
 *.swo
 *~
