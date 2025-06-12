@@ -1,4 +1,4 @@
-iam_user_name = "TravelBotUser"
+iam_user_name = "TravelBotUserDev"
 iam_role_name = "BedrockAccessRole"
-region        = "us-east-1"
+region        = "ap-south-1"
 aws_profile_name = "travelBot"
