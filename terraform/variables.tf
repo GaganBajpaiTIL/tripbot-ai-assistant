@@ -1,7 +1,7 @@
 variable "iam_user_name" {
   description = "Name of the IAM user to create"
   type        = string
-  default     = "TravelBotUser"
+  default     = "TravelBotUserDev"
 }
 
 variable "iam_role_name" {
@@ -13,7 +13,7 @@ variable "iam_role_name" {
 variable "region" {
   description = "AWS region to use"
   type        = string
-  default     = "us-east-1"
+  default     = "ap-south-1"
 }
 
 variable "aws_profile_name" {

@@ -30,8 +30,15 @@ resource "null_resource" "log" {
   }
 
   provisioner "local-exec" {
-    command     = self.triggers.log_entry
+    command     = <<-EOT
+      cat >> '${var.log_file}'
+    EOT
     interpreter = ["bash", "-c"]
-    when        = each.value.when == "destroy" ? "destroy" : "create"
+    when        = lookup(each.value, "when", "create")
+    
+    # Pass the log entry through stdin
+    environment = {
+      LOG_ENTRY = self.triggers.log_entry
+    }
   }
 }

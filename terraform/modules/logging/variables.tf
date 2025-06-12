@@ -29,3 +29,9 @@ variable "resource_attributes" {
   type        = string
   default     = null
 }
+
+variable "log_file" {
+  description = "Path to the log file where entries should be written"
+  type        = string
+  default     = "terraform_dev.log"
+}
