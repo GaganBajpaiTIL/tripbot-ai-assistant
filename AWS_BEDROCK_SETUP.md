@@ -140,3 +140,16 @@ aws bedrock list-foundation-models --region us-east-1
 - **Cost Control**: Pay only for actual usage
 
 Your TripBot now supports three AI providers for maximum reliability and flexibility!
+## Another way
+- Check terraform folder - enable IAM user TravelBotUserDev
+- For EC2/Docker at EKS,ECS - invoke with role created as BedrockAccessRole
+- ** set up AWS IAM prfofile using aws configure --profile - traveBot
+- ** Set following in ~/.aws/config 
+```
+[profile bedrock-role-access]
+role_arn = arn:aws:iam::TravelBotUserDev:role/BedrockAccessRole
+source_profile = travelBot
+region = us-east-1  # Ensure this matches your desired region
+output = json      # Ensure this matches your desired output format
+```
+- ** Set Up export AWS_PROFILE with bedrock-role-profile

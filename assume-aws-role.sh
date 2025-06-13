@@ -1,39 +1,55 @@
 #!/bin/bash
 
-# This script helps to set up an AWS CLI profile (if it doesn't exist)
-# and then assume an IAM role, making the temporary credentials available
-# in the current shell session via environment variables.
+# This script helps to:
+# 1. Set up an AWS CLI profile for a base IAM user (if it doesn't exist).
+# 2. Configure a *new* profile in ~/.aws/config that automatically assumes an IAM role.
+# 3. Sets the AWS_PROFILE environment variable to this new role-assuming profile.
 
-# Usage: source ./assume-aws-role.sh <PROFILE_NAME> <ROLE_ARN>
+# Usage: source ./assume-aws-role-config.sh <BASE_IAM_USER_PROFILE_NAME> <ROLE_ARN_TO_ASSUME>
 
 # --- Input Arguments ---
-PROFILE_NAME="$1"
-ROLE_ARN="$2"
+BASE_IAM_USER_PROFILE_NAME="$1"
+ROLE_ARN_TO_ASSUME="$2"
 
 # --- Configuration ---
 # Default values for region and output format if creating a new profile
 DEFAULT_REGION="us-east-1" # You can change this to your preferred default AWS region
 DEFAULT_OUTPUT_FORMAT="json"
 
+# The name of the new profile that will assume the role
+# This profile will be configured in ~/.aws/config
+ROLE_ASSUMING_PROFILE_NAME="bedrock-role-access"
+
 CREDENTIALS_FILE="$HOME/.aws/credentials"
 CONFIG_FILE="$HOME/.aws/config"
 
-# --- Function to check if a profile exists ---
-# Checks if the profile exists in the credentials file.
-# We'll assume if it's in credentials, it's sufficient for this script's purpose.
-profile_exists() {
+# --- Function to check if a profile exists in credentials file ---
+profile_exists_in_credentials() {
     grep -q "^\[$1\]" "$CREDENTIALS_FILE" 2>/dev/null
+}
+
+# --- Function to update or add a profile section in config file ---
+# This function is more robust for updating existing sections
+update_config_profile() {
+    local profile_name="$1"
+    local config_key="$2"
+    local config_value="$3"
+
+    # Remove existing line for the key within the profile section
+    # and then add the new line. This avoids duplicates and updates correctly.
+    sed -i "/^\[profile $profile_name\]/,/^\[/ { /$config_key =/d }" "$CONFIG_FILE" 2>/dev/null
+    sed -i "/^\[profile $profile_name\]/a $config_key = $config_value" "$CONFIG_FILE"
 }
 
 # --- Initialization Block ---
 # Check if arguments are provided
-if [ -z "$PROFILE_NAME" ] || [ -z "$ROLE_ARN" ]; then
-    echo "Usage: source $0 <PROFILE_NAME> <ROLE_ARN>"
+if [ -z "$BASE_IAM_USER_PROFILE_NAME" ] || [ -z "$ROLE_ARN_TO_ASSUME" ]; then
+    echo "Usage: source $0 <BASE_IAM_USER_PROFILE_NAME> <ROLE_ARN_TO_ASSUME>"
     echo "Example: source $0 my-dev-user-credentials arn:aws:iam::123456789012:role/BedrockAccessRole"
     return 1 # 'return' is used instead of 'exit' because the script is sourced
 fi
 
-echo "--- Initializing AWS Profile: $PROFILE_NAME ---"
+echo "--- Setting up Base IAM User Profile: $BASE_IAM_USER_PROFILE_NAME ---"
 
 # Check if the credentials file exists, create if not
 if [ ! -f "$CREDENTIALS_FILE" ]; then
@@ -51,13 +67,13 @@ if [ ! -f "$CONFIG_FILE" ]; then
     chmod 600 "$CONFIG_FILE" # Set secure permissions
 fi
 
-# Check if the profile exists in credentials file
-if ! profile_exists "$PROFILE_NAME"; then
-    echo "Profile '$PROFILE_NAME' not found in $CREDENTIALS_FILE."
+# Check if the base IAM user profile exists in credentials file
+if ! profile_exists_in_credentials "$BASE_IAM_USER_PROFILE_NAME"; then
+    echo "Profile '$BASE_IAM_USER_PROFILE_NAME' not found in $CREDENTIALS_FILE."
     echo "Please provide credentials to create it."
 
-    read -rp "Enter AWS Access Key ID: " AWS_ACCESS_KEY_ID_INPUT
-    read -rp "Enter AWS Secret Access Key: " AWS_SECRET_ACCESS_KEY_INPUT
+    read -rp "Enter AWS Access Key ID for '$BASE_IAM_USER_PROFILE_NAME': " AWS_ACCESS_KEY_ID_INPUT
+    read -rp "Enter AWS Secret Access Key for '$BASE_IAM_USER_PROFILE_NAME': " AWS_SECRET_ACCESS_KEY_INPUT
     read -rp "Enter Default region name (e.g., us-east-1) [$DEFAULT_REGION]: " USER_REGION
     USER_REGION=${USER_REGION:-$DEFAULT_REGION} # Use default if empty
     read -rp "Enter Default output format (e.g., json) [$DEFAULT_OUTPUT_FORMAT]: " USER_OUTPUT
@@ -65,85 +81,58 @@ if ! profile_exists "$PROFILE_NAME"; then
 
     # Append to credentials file
     echo "" >> "$CREDENTIALS_FILE"
-    echo "[$PROFILE_NAME]" >> "$CREDENTIALS_FILE"
+    echo "[$BASE_IAM_USER_PROFILE_NAME]" >> "$CREDENTIALS_FILE"
     echo "aws_access_key_id = $AWS_ACCESS_KEY_ID_INPUT" >> "$CREDENTIALS_FILE"
     echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY_INPUT" >> "$CREDENTIALS_FILE"
 
-    # Append to config file (or update if already exists)
-    # This section removes any existing profile definition and then adds it
-    # This is a bit more robust than just appending.
-    sed -i "/^\[profile $PROFILE_NAME\]/,/^\[/ { /^\[profile $PROFILE_NAME\]/!b; d }" "$CONFIG_FILE" 2>/dev/null
-    sed -i "/^\[profile $PROFILE_NAME\]$//,+3d" "$CONFIG_FILE" 2>/dev/null # Attempt to remove old entry more thoroughly
-
-    echo "" >> "$CONFIG_FILE"
-    echo "[profile $PROFILE_NAME]" >> "$CONFIG_FILE"
-    echo "region = $USER_REGION" >> "$CONFIG_FILE"
-    echo "output = $USER_OUTPUT" >> "$CONFIG_FILE"
-
-    echo "Profile '$PROFILE_NAME' created and configured."
+    echo "Profile '$BASE_IAM_USER_PROFILE_NAME' created in $CREDENTIALS_FILE."
 else
-    echo "Profile '$PROFILE_NAME' already exists. Using existing configuration."
+    echo "Profile '$BASE_IAM_USER_PROFILE_NAME' already exists in $CREDENTIALS_FILE. Using existing configuration."
+    # If the profile exists, still ensure it has a region and output in config file
+    # Get region from existing config if possible, otherwise use default
+    USER_REGION=$(grep -A 2 "^\[profile $BASE_IAM_USER_PROFILE_NAME\]" "$CONFIG_FILE" | grep "region =" | awk '{print $3}' | head -n 1)
+    USER_REGION=${USER_REGION:-$DEFAULT_REGION}
+    USER_OUTPUT=$(grep -A 2 "^\[profile $BASE_IAM_USER_PROFILE_NAME\]" "$CONFIG_FILE" | grep "output =" | awk '{print $3}' | head -n 1)
+    USER_OUTPUT=${USER_OUTPUT:-$DEFAULT_OUTPUT_FORMAT}
 fi
 
-echo "--- Assuming Role: $ROLE_ARN ---"
 
-# 2. Assume the role using the provided profile
-# Using --output text to get a tab-separated string for easy parsing with awk
-ASSUME_ROLE_OUTPUT=$(aws sts assume-role \
-    --profile "$PROFILE_NAME" \
-    --role-arn "$ROLE_ARN" \
-    --role-session-name "${PROFILE_NAME}-session" \
-    --duration-seconds 3600 \
-    --output text 2>&1)
+echo "--- Configuring Role Assumption Profile: $ROLE_ASSUMING_PROFILE_NAME ---"
 
-# Check for errors from assume-role command
-if echo "$ASSUME_ROLE_OUTPUT" | grep -q "An error occurred"; then
-    echo "Error assuming role:"
-    echo "$ASSUME_ROLE_OUTPUT"
-    echo "Please ensure: "
-    echo "  - Your IAM user ('$PROFILE_NAME') has 'sts:AssumeRole' permission on '$ROLE_ARN'."
-    echo "  - The trust policy of '$ROLE_ARN' allows assumption by your user."
-    echo "  - The profile credentials for '$PROFILE_NAME' are valid."
-    return 1
-fi
+# Add or update the role-assuming profile section in ~/.aws/config
+# First, remove existing section to ensure clean update
+sed -i "/^\[profile $ROLE_ASSUMING_PROFILE_NAME\]/,/^\[/ { /^\[profile $ROLE_ASSUMING_PROFILE_NAME\]/!b; d }" "$CONFIG_FILE" 2>/dev/null
+sed -i "/^\[profile $ROLE_ASSUMING_PROFILE_NAME\]$//,+3d" "$CONFIG_FILE" 2>/dev/null # More thorough removal
 
-# 3. Parse the output to extract temporary credentials using awk
-# The output format for --output text is typically:
-# CREDENTIALS    <AccessKeyId>    <SecretAccessKey>    <Expiration>    <SessionToken>
-AWS_ACCESS_KEY_ID=$(echo "$ASSUME_ROLE_OUTPUT" | awk '{print $2}')
-AWS_SECRET_ACCESS_KEY=$(echo "$ASSUME_ROLE_OUTPUT" | awk '{print $3}')
-AWS_SESSION_TOKEN=$(echo "$ASSUME_ROLE_OUTPUT" | awk '{print $5}')
+echo "" >> "$CONFIG_FILE"
+echo "[profile $ROLE_ASSUMING_PROFILE_NAME]" >> "$CONFIG_FILE"
+echo "role_arn = $ROLE_ARN_TO_ASSUME" >> "$CONFIG_FILE"
+echo "source_profile = $BASE_IAM_USER_PROFILE_NAME" >> "$CONFIG_FILE"
+echo "region = $USER_REGION" >> "$CONFIG_FILE" # Use the region from the base profile or default
+echo "output = $USER_OUTPUT" >> "$CONFIG_FILE" # Use the output from the base profile or default
 
-# 4. Export these as environment variables
-export AWS_ACCESS_KEY_ID
-export AWS_SECRET_ACCESS_KEY
-export AWS_SESSION_TOKEN
+echo "Configured role-assuming profile '$ROLE_ASSUMING_PROFILE_NAME' in $CONFIG_FILE."
 
-# 5. Set AWS_PROFILE to the original profile name
-# IMPORTANT NOTE ON CREDENTIAL PRECEDENCE:
-# When AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_SESSION_TOKEN
-# environment variables are set, Boto3 (Python SDK) and AWS CLI (v2)
-# will prioritize these temporary credentials over any profile set via AWS_PROFILE
-# or in the shared credential/config files.
-# Setting AWS_PROFILE here is primarily for conceptual clarity or for
-# tools that might specifically look for AWS_PROFILE before checking temporary env vars.
-export AWS_PROFILE="$PROFILE_NAME"
-
+# 3. Export AWS_PROFILE to point to the new role-assuming profile
+export AWS_PROFILE="$ROLE_ASSUMING_PROFILE_NAME"
 
 echo ""
-echo "--- Role Assumption Complete ---"
-echo "Temporary credentials for role '$ROLE_ARN' have been set as environment variables."
-echo "Access Key ID: $AWS_ACCESS_KEY_ID"
-echo "Secret Access Key: (hidden for security)"
-echo "Session Token: (hidden for security)"
-echo "AWS_PROFILE environment variable set to: $AWS_PROFILE (referencing your source profile)"
+echo "--- Setup Complete ---"
+echo "Your AWS CLI and Boto3 will now use the profile: '$ROLE_ASSUMING_PROFILE_NAME'"
+echo "This profile is configured to automatically assume the role: '$ROLE_ARN_TO_ASSUME'"
+echo "using credentials from your base IAM user profile: '$BASE_IAM_USER_PROFILE_NAME'."
 echo ""
-echo "These credentials will expire in 1 hour (3600 seconds) by default."
-echo "You can now run AWS CLI commands using these temporary permissions, e.g.:"
+echo "You can now run AWS CLI commands directly, for example:"
 echo "aws sts get-caller-identity"
 echo "aws bedrock list-foundation-models"
 echo ""
-echo "To revert to your previous AWS configuration, run:"
-echo "unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_PROFILE"
+echo "Boto3 (Python SDK) will also automatically use this configuration."
+echo "Example Python code (after sourcing this script):"
+echo "import boto3"
+echo "bedrock_runtime_client = boto3.client('bedrock-runtime')"
+echo "response = bedrock_runtime_client.list_foundation_models()"
+echo ""
+echo "To revert to your previous AWS profile, run:"
+echo "unset AWS_PROFILE"
 echo "Or open a new terminal session."
 

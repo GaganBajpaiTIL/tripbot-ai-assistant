@@ -159,8 +159,4 @@ module "access_key_destruction_logging" {
   }
 }
 
-# Attach Bedrock access policy to user
-resource "aws_iam_user_policy_attachment" "bedrock_access" {
-  user       = aws_iam_user.travel_bot.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonBedrockFullAccess"
-}
+
