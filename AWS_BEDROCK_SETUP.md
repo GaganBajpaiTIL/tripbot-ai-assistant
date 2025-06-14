@@ -147,9 +147,17 @@ Your TripBot now supports three AI providers for maximum reliability and flexibi
 - ** Set following in ~/.aws/config 
 ```
 [profile bedrock-role-access]
-role_arn = arn:aws:iam::TravelBotUserDev:role/BedrockAccessRole
+role_arn = arn:aws:iam::<YOUR_ACCOUNT_ID>:role/BedrockAccessRole
 source_profile = travelBot
 region = us-east-1  # Ensure this matches your desired region
 output = json      # Ensure this matches your desired output format
 ```
-- ** Set Up export AWS_PROFILE with bedrock-role-profile
+- ** Set Up export AWS_PROFILE with bedrock-role-access
+```
+- aws configure --profile travelBot
+- vim ~/.aws/config 
+- export AWS_PROFILE="bedrock-role-access"
+
+```
+- ** Test with 
+ aws bedrock list-foundation-models 
