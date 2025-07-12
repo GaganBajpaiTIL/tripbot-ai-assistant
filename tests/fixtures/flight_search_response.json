@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "count": 2
+  },
+  "data": [
+    {
+      "id": "1",
+      "price": {
+        "total": "350.00",
+        "currency": "USD"
+      },
+      "itineraries": [
+        {
+          "duration": "PT2H30M",
+          "segments": [
+            {
+              "departure": {
+                "iataCode": "DEL",
+                "at": "2025-08-01T08:00:00"
+              },
+              "arrival": {
+                "iataCode": "BOM",
+                "at": "2025-08-01T10:30:00"
+              },
+              "carrierCode": "AI",
+              "number": "101",
+              "price": {
+                "amount": "150.00",
+                "currency": "USD"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "price": {
+        "total": "400.00",
+        "currency": "USD"
+      },
+      "itineraries": [
+        {
+          "duration": "PT3H15M",
+          "segments": [
+            {
+              "departure": {
+                "iataCode": "DEL",
+                "at": "2025-08-01T14:00:00"
+              },
+              "arrival": {
+                "iataCode": "BOM",
+                "at": "2025-08-01T17:15:00"
+              },
+              "carrierCode": "6E",
+              "number": "202",
+              "price": {
+                "amount": "200.00",
+                "currency": "USD"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

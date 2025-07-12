@@ -1,0 +1,1678 @@
+[
+  {
+    "type": "flight-offer",
+    "id": "1",
+    "source": "GDS",
+    "instantTicketingRequired": false,
+    "nonHomogeneous": false,
+    "oneWay": false,
+    "isUpsellOffer": false,
+    "lastTicketingDate": "2025-07-03",
+    "lastTicketingDateTime": "2025-07-03",
+    "numberOfBookableSeats": 3,
+    "itineraries": [
+      {
+        "duration": "PT8H27M",
+        "segments": [
+          {
+            "departure": {
+              "iataCode": "SFO",
+              "terminal": "I",
+              "at": "2025-07-20T00:32:00"
+            },
+            "arrival": {
+              "iataCode": "DFW",
+              "terminal": "E",
+              "at": "2025-07-20T06:07:00"
+            },
+            "carrierCode": "F9",
+            "number": "4000",
+            "aircraft": {
+              "code": "32N"
+            },
+            "operating": {
+              "carrierCode": "F9"
+            },
+            "duration": "PT3H35M",
+            "id": "3",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          },
+          {
+            "departure": {
+              "iataCode": "DFW",
+              "terminal": "E",
+              "at": "2025-07-20T07:16:00"
+            },
+            "arrival": {
+              "iataCode": "JFK",
+              "at": "2025-07-20T11:59:00"
+            },
+            "carrierCode": "F9",
+            "number": "1512",
+            "aircraft": {
+              "code": "32N"
+            },
+            "operating": {
+              "carrierCode": "F9"
+            },
+            "duration": "PT3H43M",
+            "id": "4",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          }
+        ]
+      }
+    ],
+    "price": {
+      "currency": "EUR",
+      "total": "296.48",
+      "base": "236.00",
+      "fees": [
+        {
+          "amount": "0.00",
+          "type": "SUPPLIER"
+        },
+        {
+          "amount": "0.00",
+          "type": "TICKETING"
+        }
+      ],
+      "grandTotal": "296.48"
+    },
+    "pricingOptions": {
+      "fareType": [
+        "PUBLISHED"
+      ],
+      "includedCheckedBagsOnly": false
+    },
+    "validatingAirlineCodes": [
+      "F9"
+    ],
+    "travelerPricings": [
+      {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+          "currency": "EUR",
+          "total": "148.24",
+          "base": "118.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "3",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "4",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "travelerId": "2",
+        "fareOption": "STANDARD",
+        "travelerType": "CHILD",
+        "price": {
+          "currency": "EUR",
+          "total": "148.24",
+          "base": "118.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "3",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "4",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "flight-offer",
+    "id": "2",
+    "source": "GDS",
+    "instantTicketingRequired": false,
+    "nonHomogeneous": false,
+    "oneWay": false,
+    "isUpsellOffer": false,
+    "lastTicketingDate": "2025-07-03",
+    "lastTicketingDateTime": "2025-07-03",
+    "numberOfBookableSeats": 3,
+    "itineraries": [
+      {
+        "duration": "PT9H11M",
+        "segments": [
+          {
+            "departure": {
+              "iataCode": "SFO",
+              "terminal": "I",
+              "at": "2025-07-20T21:49:00"
+            },
+            "arrival": {
+              "iataCode": "MCO",
+              "at": "2025-07-21T06:18:00"
+            },
+            "carrierCode": "F9",
+            "number": "1646",
+            "aircraft": {
+              "code": "32Q"
+            },
+            "operating": {
+              "carrierCode": "F9"
+            },
+            "duration": "PT5H29M",
+            "id": "1",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          },
+          {
+            "departure": {
+              "iataCode": "MCO",
+              "at": "2025-07-21T07:13:00"
+            },
+            "arrival": {
+              "iataCode": "JFK",
+              "at": "2025-07-21T10:00:00"
+            },
+            "carrierCode": "F9",
+            "number": "4872",
+            "aircraft": {
+              "code": "32Q"
+            },
+            "operating": {
+              "carrierCode": "F9"
+            },
+            "duration": "PT2H47M",
+            "id": "2",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          }
+        ]
+      }
+    ],
+    "price": {
+      "currency": "EUR",
+      "total": "296.48",
+      "base": "236.00",
+      "fees": [
+        {
+          "amount": "0.00",
+          "type": "SUPPLIER"
+        },
+        {
+          "amount": "0.00",
+          "type": "TICKETING"
+        }
+      ],
+      "grandTotal": "296.48"
+    },
+    "pricingOptions": {
+      "fareType": [
+        "PUBLISHED"
+      ],
+      "includedCheckedBagsOnly": false
+    },
+    "validatingAirlineCodes": [
+      "F9"
+    ],
+    "travelerPricings": [
+      {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+          "currency": "EUR",
+          "total": "148.24",
+          "base": "118.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "1",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "2",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "travelerId": "2",
+        "fareOption": "STANDARD",
+        "travelerType": "CHILD",
+        "price": {
+          "currency": "EUR",
+          "total": "148.24",
+          "base": "118.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "1",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "2",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "flight-offer",
+    "id": "3",
+    "source": "GDS",
+    "instantTicketingRequired": false,
+    "nonHomogeneous": false,
+    "oneWay": false,
+    "isUpsellOffer": false,
+    "lastTicketingDate": "2025-07-03",
+    "lastTicketingDateTime": "2025-07-03",
+    "numberOfBookableSeats": 3,
+    "itineraries": [
+      {
+        "duration": "PT12H39M",
+        "segments": [
+          {
+            "departure": {
+              "iataCode": "SFO",
+              "terminal": "I",
+              "at": "2025-07-20T13:51:00"
+            },
+            "arrival": {
+              "iataCode": "LAS",
+              "terminal": "3",
+              "at": "2025-07-20T15:30:00"
+            },
+            "carrierCode": "F9",
+            "number": "2486",
+            "aircraft": {
+              "code": "32Q"
+            },
+            "operating": {
+              "carrierCode": "F9"
+            },
+            "duration": "PT1H39M",
+            "id": "9",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          },
+          {
+            "departure": {
+              "iataCode": "LAS",
+              "terminal": "3",
+              "at": "2025-07-20T21:32:00"
+            },
+            "arrival": {
+              "iataCode": "JFK",
+              "at": "2025-07-21T05:30:00"
+            },
+            "carrierCode": "F9",
+            "number": "3238",
+            "aircraft": {
+              "code": "32Q"
+            },
+            "operating": {
+              "carrierCode": "F9"
+            },
+            "duration": "PT4H58M",
+            "id": "10",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          }
+        ]
+      }
+    ],
+    "price": {
+      "currency": "EUR",
+      "total": "306.06",
+      "base": "236.00",
+      "fees": [
+        {
+          "amount": "0.00",
+          "type": "SUPPLIER"
+        },
+        {
+          "amount": "0.00",
+          "type": "TICKETING"
+        }
+      ],
+      "grandTotal": "306.06"
+    },
+    "pricingOptions": {
+      "fareType": [
+        "PUBLISHED"
+      ],
+      "includedCheckedBagsOnly": false
+    },
+    "validatingAirlineCodes": [
+      "F9"
+    ],
+    "travelerPricings": [
+      {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+          "currency": "EUR",
+          "total": "153.03",
+          "base": "118.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "9",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "10",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "travelerId": "2",
+        "fareOption": "STANDARD",
+        "travelerType": "CHILD",
+        "price": {
+          "currency": "EUR",
+          "total": "153.03",
+          "base": "118.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "9",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "10",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "flight-offer",
+    "id": "4",
+    "source": "GDS",
+    "instantTicketingRequired": false,
+    "nonHomogeneous": false,
+    "oneWay": false,
+    "isUpsellOffer": false,
+    "lastTicketingDate": "2025-07-03",
+    "lastTicketingDateTime": "2025-07-03",
+    "numberOfBookableSeats": 3,
+    "itineraries": [
+      {
+        "duration": "PT15H28M",
+        "segments": [
+          {
+            "departure": {
+              "iataCode": "SFO",
+              "terminal": "I",
+              "at": "2025-07-20T11:02:00"
+            },
+            "arrival": {
+              "iataCode": "LAS",
+              "terminal": "3",
+              "at": "2025-07-20T12:45:00"
+            },
+            "carrierCode": "F9",
+            "number": "4158",
+            "aircraft": {
+              "code": "32N"
+            },
+            "operating": {
+              "carrierCode": "F9"
+            },
+            "duration": "PT1H43M",
+            "id": "5",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          },
+          {
+            "departure": {
+              "iataCode": "LAS",
+              "terminal": "3",
+              "at": "2025-07-20T21:32:00"
+            },
+            "arrival": {
+              "iataCode": "JFK",
+              "at": "2025-07-21T05:30:00"
+            },
+            "carrierCode": "F9",
+            "number": "3238",
+            "aircraft": {
+              "code": "32Q"
+            },
+            "operating": {
+              "carrierCode": "F9"
+            },
+            "duration": "PT4H58M",
+            "id": "6",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          }
+        ]
+      }
+    ],
+    "price": {
+      "currency": "EUR",
+      "total": "306.06",
+      "base": "236.00",
+      "fees": [
+        {
+          "amount": "0.00",
+          "type": "SUPPLIER"
+        },
+        {
+          "amount": "0.00",
+          "type": "TICKETING"
+        }
+      ],
+      "grandTotal": "306.06"
+    },
+    "pricingOptions": {
+      "fareType": [
+        "PUBLISHED"
+      ],
+      "includedCheckedBagsOnly": false
+    },
+    "validatingAirlineCodes": [
+      "F9"
+    ],
+    "travelerPricings": [
+      {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+          "currency": "EUR",
+          "total": "153.03",
+          "base": "118.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "5",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "6",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "travelerId": "2",
+        "fareOption": "STANDARD",
+        "travelerType": "CHILD",
+        "price": {
+          "currency": "EUR",
+          "total": "153.03",
+          "base": "118.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "5",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "6",
+            "cabin": "ECONOMY",
+            "fareBasis": "M07PXP5",
+            "brandedFare": "ECO",
+            "brandedFareLabel": "STANDARD",
+            "class": "M",
+            "amenities": [
+              {
+                "description": "UPTO100LB 45KG BAGGAGE",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "FIRST CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND CHECKED BAG",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "CARRY16KG 35LB UPTO46LI 118LCM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRE RESERVED SEAT ASSIGNMENT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "PRIORITY BOARDING",
+                "isChargeable": true,
+                "amenityType": "TRAVEL_SERVICES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "BASIC SEAT",
+                "isChargeable": true,
+                "amenityType": "BRANDED_FARES",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "flight-offer",
+    "id": "5",
+    "source": "GDS",
+    "instantTicketingRequired": false,
+    "nonHomogeneous": false,
+    "oneWay": false,
+    "isUpsellOffer": false,
+    "lastTicketingDate": "2025-07-03",
+    "lastTicketingDateTime": "2025-07-03",
+    "numberOfBookableSeats": 9,
+    "itineraries": [
+      {
+        "duration": "PT7H32M",
+        "segments": [
+          {
+            "departure": {
+              "iataCode": "SFO",
+              "terminal": "I",
+              "at": "2025-07-20T23:59:00"
+            },
+            "arrival": {
+              "iataCode": "MSP",
+              "terminal": "2",
+              "at": "2025-07-21T05:35:00"
+            },
+            "carrierCode": "SY",
+            "number": "398",
+            "aircraft": {
+              "code": "738"
+            },
+            "operating": {
+              "carrierCode": "SY"
+            },
+            "duration": "PT3H36M",
+            "id": "7",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          },
+          {
+            "departure": {
+              "iataCode": "MSP",
+              "terminal": "2",
+              "at": "2025-07-21T06:48:00"
+            },
+            "arrival": {
+              "iataCode": "JFK",
+              "terminal": "7",
+              "at": "2025-07-21T10:31:00"
+            },
+            "carrierCode": "SY",
+            "number": "567",
+            "aircraft": {
+              "code": "738"
+            },
+            "operating": {
+              "carrierCode": "SY"
+            },
+            "duration": "PT2H43M",
+            "id": "8",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          }
+        ]
+      }
+    ],
+    "price": {
+      "currency": "EUR",
+      "total": "322.28",
+      "base": "260.00",
+      "fees": [
+        {
+          "amount": "0.00",
+          "type": "SUPPLIER"
+        },
+        {
+          "amount": "0.00",
+          "type": "TICKETING"
+        }
+      ],
+      "grandTotal": "322.28"
+    },
+    "pricingOptions": {
+      "fareType": [
+        "PUBLISHED"
+      ],
+      "includedCheckedBagsOnly": false
+    },
+    "validatingAirlineCodes": [
+      "SY"
+    ],
+    "travelerPricings": [
+      {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+          "currency": "EUR",
+          "total": "161.14",
+          "base": "130.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "7",
+            "cabin": "ECONOMY",
+            "fareBasis": "W4DACAY",
+            "class": "W",
+            "includedCheckedBags": {
+              "quantity": 0
+            },
+            "includedCabinBags": {
+              "quantity": 0
+            }
+          },
+          {
+            "segmentId": "8",
+            "cabin": "ECONOMY",
+            "fareBasis": "W4DACAY",
+            "class": "W",
+            "includedCheckedBags": {
+              "quantity": 0
+            },
+            "includedCabinBags": {
+              "quantity": 0
+            }
+          }
+        ]
+      },
+      {
+        "travelerId": "2",
+        "fareOption": "STANDARD",
+        "travelerType": "CHILD",
+        "price": {
+          "currency": "EUR",
+          "total": "161.14",
+          "base": "130.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "7",
+            "cabin": "ECONOMY",
+            "fareBasis": "W4DACAY",
+            "class": "W"
+          },
+          {
+            "segmentId": "8",
+            "cabin": "ECONOMY",
+            "fareBasis": "W4DACAY",
+            "class": "W"
+          }
+        ]
+      }
+    ]
+  }
+]

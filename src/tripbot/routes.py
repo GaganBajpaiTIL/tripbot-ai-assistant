@@ -185,7 +185,7 @@ def extract_data_from_message(message: str, current_step: str, existing_data: di
             data['departure_location'] = message.strip()
         
         elif current_step == 'date_collection':
-            # Simple date extraction - in a real app, you'd use more sophisticated parsing
+            # TODO: Add sophisticated date parsing.
             if 'departure_date' not in data:
                 data['departure_date'] = message.strip()
             elif 'return_date' not in data:

@@ -1,0 +1,1087 @@
+[
+  {
+    "type": "flight-offer",
+    "id": "1",
+    "source": "GDS",
+    "instantTicketingRequired": false,
+    "nonHomogeneous": false,
+    "oneWay": false,
+    "isUpsellOffer": false,
+    "lastTicketingDate": "2025-08-10",
+    "lastTicketingDateTime": "2025-08-10",
+    "numberOfBookableSeats": 9,
+    "itineraries": [
+      {
+        "duration": "PT9H15M",
+        "segments": [
+          {
+            "departure": {
+              "iataCode": "LAX",
+              "at": "2025-08-10T18:20:00"
+            },
+            "arrival": {
+              "iataCode": "LHR",
+              "at": "2025-08-11T11:35:00"
+            },
+            "carrierCode": "6X",
+            "number": "278",
+            "aircraft": {
+              "code": "777"
+            },
+            "operating": {
+              "carrierCode": "6X"
+            },
+            "duration": "PT9H15M",
+            "id": "7",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          }
+        ]
+      }
+    ],
+    "price": {
+      "currency": "EUR",
+      "total": "476.72",
+      "base": "428.00",
+      "fees": [
+        {
+          "amount": "0.00",
+          "type": "SUPPLIER"
+        },
+        {
+          "amount": "0.00",
+          "type": "TICKETING"
+        }
+      ],
+      "grandTotal": "476.72",
+      "additionalServices": [
+        {
+          "amount": "2.00",
+          "type": "CHECKED_BAGS"
+        }
+      ]
+    },
+    "pricingOptions": {
+      "fareType": [
+        "PUBLISHED"
+      ],
+      "includedCheckedBagsOnly": false
+    },
+    "validatingAirlineCodes": [
+      "6X"
+    ],
+    "travelerPricings": [
+      {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+          "currency": "EUR",
+          "total": "238.36",
+          "base": "214.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "7",
+            "cabin": "ECONOMY",
+            "fareBasis": "YROBSON",
+            "class": "Y",
+            "includedCheckedBags": {
+              "quantity": 1
+            }
+          }
+        ]
+      },
+      {
+        "travelerId": "2",
+        "fareOption": "STANDARD",
+        "travelerType": "CHILD",
+        "price": {
+          "currency": "EUR",
+          "total": "238.36",
+          "base": "214.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "7",
+            "cabin": "ECONOMY",
+            "fareBasis": "YROBSON",
+            "class": "Y"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "flight-offer",
+    "id": "2",
+    "source": "GDS",
+    "instantTicketingRequired": false,
+    "nonHomogeneous": false,
+    "oneWay": false,
+    "isUpsellOffer": false,
+    "lastTicketingDate": "2025-08-10",
+    "lastTicketingDateTime": "2025-08-10",
+    "numberOfBookableSeats": 9,
+    "itineraries": [
+      {
+        "duration": "PT16H",
+        "segments": [
+          {
+            "departure": {
+              "iataCode": "LAX",
+              "at": "2025-08-10T07:00:00"
+            },
+            "arrival": {
+              "iataCode": "JFK",
+              "at": "2025-08-10T15:30:00"
+            },
+            "carrierCode": "6X",
+            "number": "3669",
+            "aircraft": {
+              "code": "767"
+            },
+            "operating": {
+              "carrierCode": "6X"
+            },
+            "duration": "PT5H30M",
+            "id": "1",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          },
+          {
+            "departure": {
+              "iataCode": "JFK",
+              "at": "2025-08-10T18:00:00"
+            },
+            "arrival": {
+              "iataCode": "LHR",
+              "at": "2025-08-11T06:00:00"
+            },
+            "carrierCode": "6X",
+            "number": "3916",
+            "aircraft": {
+              "code": "738"
+            },
+            "operating": {
+              "carrierCode": "6X"
+            },
+            "duration": "PT8H",
+            "id": "2",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          }
+        ]
+      }
+    ],
+    "price": {
+      "currency": "EUR",
+      "total": "476.72",
+      "base": "428.00",
+      "fees": [
+        {
+          "amount": "0.00",
+          "type": "SUPPLIER"
+        },
+        {
+          "amount": "0.00",
+          "type": "TICKETING"
+        }
+      ],
+      "grandTotal": "476.72",
+      "additionalServices": [
+        {
+          "amount": "2.00",
+          "type": "CHECKED_BAGS"
+        }
+      ]
+    },
+    "pricingOptions": {
+      "fareType": [
+        "PUBLISHED"
+      ],
+      "includedCheckedBagsOnly": false
+    },
+    "validatingAirlineCodes": [
+      "6X"
+    ],
+    "travelerPricings": [
+      {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+          "currency": "EUR",
+          "total": "238.36",
+          "base": "214.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "1",
+            "cabin": "ECONOMY",
+            "fareBasis": "YROBSON",
+            "class": "Y",
+            "includedCheckedBags": {
+              "quantity": 1
+            }
+          },
+          {
+            "segmentId": "2",
+            "cabin": "ECONOMY",
+            "fareBasis": "YROBSON",
+            "class": "Y",
+            "includedCheckedBags": {
+              "quantity": 1
+            }
+          }
+        ]
+      },
+      {
+        "travelerId": "2",
+        "fareOption": "STANDARD",
+        "travelerType": "CHILD",
+        "price": {
+          "currency": "EUR",
+          "total": "238.36",
+          "base": "214.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "1",
+            "cabin": "ECONOMY",
+            "fareBasis": "YROBSON",
+            "class": "Y"
+          },
+          {
+            "segmentId": "2",
+            "cabin": "ECONOMY",
+            "fareBasis": "YROBSON",
+            "class": "Y"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "flight-offer",
+    "id": "3",
+    "source": "GDS",
+    "instantTicketingRequired": false,
+    "nonHomogeneous": false,
+    "oneWay": false,
+    "isUpsellOffer": false,
+    "lastTicketingDate": "2025-08-10",
+    "lastTicketingDateTime": "2025-08-10",
+    "numberOfBookableSeats": 9,
+    "itineraries": [
+      {
+        "duration": "PT16H30M",
+        "segments": [
+          {
+            "departure": {
+              "iataCode": "LAX",
+              "at": "2025-08-10T06:30:00"
+            },
+            "arrival": {
+              "iataCode": "JFK",
+              "at": "2025-08-10T15:10:00"
+            },
+            "carrierCode": "6X",
+            "number": "3668",
+            "aircraft": {
+              "code": "767"
+            },
+            "operating": {
+              "carrierCode": "6X"
+            },
+            "duration": "PT5H40M",
+            "id": "8",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          },
+          {
+            "departure": {
+              "iataCode": "JFK",
+              "at": "2025-08-10T18:00:00"
+            },
+            "arrival": {
+              "iataCode": "LHR",
+              "at": "2025-08-11T06:00:00"
+            },
+            "carrierCode": "6X",
+            "number": "3917",
+            "aircraft": {
+              "code": "738"
+            },
+            "operating": {
+              "carrierCode": "6X"
+            },
+            "duration": "PT8H",
+            "id": "9",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          }
+        ]
+      }
+    ],
+    "price": {
+      "currency": "EUR",
+      "total": "476.72",
+      "base": "428.00",
+      "fees": [
+        {
+          "amount": "0.00",
+          "type": "SUPPLIER"
+        },
+        {
+          "amount": "0.00",
+          "type": "TICKETING"
+        }
+      ],
+      "grandTotal": "476.72",
+      "additionalServices": [
+        {
+          "amount": "2.00",
+          "type": "CHECKED_BAGS"
+        }
+      ]
+    },
+    "pricingOptions": {
+      "fareType": [
+        "PUBLISHED"
+      ],
+      "includedCheckedBagsOnly": false
+    },
+    "validatingAirlineCodes": [
+      "6X"
+    ],
+    "travelerPricings": [
+      {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+          "currency": "EUR",
+          "total": "238.36",
+          "base": "214.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "8",
+            "cabin": "ECONOMY",
+            "fareBasis": "YROBSON",
+            "class": "Y",
+            "includedCheckedBags": {
+              "quantity": 1
+            }
+          },
+          {
+            "segmentId": "9",
+            "cabin": "ECONOMY",
+            "fareBasis": "YROBSON",
+            "class": "Y",
+            "includedCheckedBags": {
+              "quantity": 1
+            }
+          }
+        ]
+      },
+      {
+        "travelerId": "2",
+        "fareOption": "STANDARD",
+        "travelerType": "CHILD",
+        "price": {
+          "currency": "EUR",
+          "total": "238.36",
+          "base": "214.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "8",
+            "cabin": "ECONOMY",
+            "fareBasis": "YROBSON",
+            "class": "Y"
+          },
+          {
+            "segmentId": "9",
+            "cabin": "ECONOMY",
+            "fareBasis": "YROBSON",
+            "class": "Y"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "flight-offer",
+    "id": "4",
+    "source": "GDS",
+    "instantTicketingRequired": false,
+    "nonHomogeneous": false,
+    "oneWay": false,
+    "isUpsellOffer": false,
+    "lastTicketingDate": "2025-07-04",
+    "lastTicketingDateTime": "2025-07-04",
+    "numberOfBookableSeats": 9,
+    "itineraries": [
+      {
+        "duration": "PT17H5M",
+        "segments": [
+          {
+            "departure": {
+              "iataCode": "LAX",
+              "terminal": "B",
+              "at": "2025-08-10T16:40:00"
+            },
+            "arrival": {
+              "iataCode": "LIS",
+              "terminal": "1",
+              "at": "2025-08-11T11:45:00"
+            },
+            "carrierCode": "TP",
+            "number": "248",
+            "aircraft": {
+              "code": "339"
+            },
+            "operating": {
+              "carrierCode": "TP"
+            },
+            "duration": "PT11H5M",
+            "id": "3",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          },
+          {
+            "departure": {
+              "iataCode": "LIS",
+              "terminal": "1",
+              "at": "2025-08-11T15:00:00"
+            },
+            "arrival": {
+              "iataCode": "LHR",
+              "terminal": "2",
+              "at": "2025-08-11T17:45:00"
+            },
+            "carrierCode": "TP",
+            "number": "1350",
+            "aircraft": {
+              "code": "32N"
+            },
+            "operating": {
+              "carrierCode": "TP"
+            },
+            "duration": "PT2H45M",
+            "id": "4",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          }
+        ]
+      }
+    ],
+    "price": {
+      "currency": "EUR",
+      "total": "550.74",
+      "base": "252.00",
+      "fees": [
+        {
+          "amount": "0.00",
+          "type": "SUPPLIER"
+        },
+        {
+          "amount": "0.00",
+          "type": "TICKETING"
+        }
+      ],
+      "grandTotal": "550.74",
+      "additionalServices": [
+        {
+          "amount": "125.00",
+          "type": "CHECKED_BAGS"
+        }
+      ]
+    },
+    "pricingOptions": {
+      "fareType": [
+        "PUBLISHED"
+      ],
+      "includedCheckedBagsOnly": false
+    },
+    "validatingAirlineCodes": [
+      "TP"
+    ],
+    "travelerPricings": [
+      {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+          "currency": "EUR",
+          "total": "275.37",
+          "base": "126.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "3",
+            "cabin": "ECONOMY",
+            "fareBasis": "KL0DSI05",
+            "brandedFare": "DISCOUNT",
+            "brandedFareLabel": "DISCOUNT",
+            "class": "K",
+            "includedCheckedBags": {
+              "quantity": 0
+            },
+            "includedCabinBags": {
+              "quantity": 1
+            },
+            "amenities": [
+              {
+                "description": "FIRST BAG UP TO 23KG AND 158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND BAG UP TO 23KG AND158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "EXTRA LEG ROOM OR FRONT SEAT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SEAT RESERVATION",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "MEAL 1",
+                "isChargeable": false,
+                "amenityType": "MEAL",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "4",
+            "cabin": "ECONOMY",
+            "fareBasis": "KL0DSI05",
+            "brandedFare": "DISCOUNT",
+            "brandedFareLabel": "DISCOUNT",
+            "class": "K",
+            "includedCheckedBags": {
+              "quantity": 0
+            },
+            "includedCabinBags": {
+              "quantity": 1
+            },
+            "amenities": [
+              {
+                "description": "FIRST BAG UP TO 23KG AND 158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND BAG UP TO 23KG AND158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "EXTRA LEG ROOM OR FRONT SEAT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SEAT RESERVATION",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "MEAL 1",
+                "isChargeable": false,
+                "amenityType": "MEAL",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "travelerId": "2",
+        "fareOption": "STANDARD",
+        "travelerType": "CHILD",
+        "price": {
+          "currency": "EUR",
+          "total": "275.37",
+          "base": "126.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "3",
+            "cabin": "ECONOMY",
+            "fareBasis": "KL0DSI05",
+            "brandedFare": "DISCOUNT",
+            "brandedFareLabel": "DISCOUNT",
+            "class": "K",
+            "amenities": [
+              {
+                "description": "FIRST BAG UP TO 23KG AND 158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND BAG UP TO 23KG AND158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "EXTRA LEG ROOM OR FRONT SEAT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SEAT RESERVATION",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "MEAL 1",
+                "isChargeable": false,
+                "amenityType": "MEAL",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "4",
+            "cabin": "ECONOMY",
+            "fareBasis": "KL0DSI05",
+            "brandedFare": "DISCOUNT",
+            "brandedFareLabel": "DISCOUNT",
+            "class": "K",
+            "amenities": [
+              {
+                "description": "FIRST BAG UP TO 23KG AND 158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND BAG UP TO 23KG AND158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "EXTRA LEG ROOM OR FRONT SEAT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SEAT RESERVATION",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "MEAL 1",
+                "isChargeable": false,
+                "amenityType": "MEAL",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "flight-offer",
+    "id": "5",
+    "source": "GDS",
+    "instantTicketingRequired": false,
+    "nonHomogeneous": false,
+    "oneWay": false,
+    "isUpsellOffer": false,
+    "lastTicketingDate": "2025-07-04",
+    "lastTicketingDateTime": "2025-07-04",
+    "numberOfBookableSeats": 9,
+    "itineraries": [
+      {
+        "duration": "PT18H10M",
+        "segments": [
+          {
+            "departure": {
+              "iataCode": "LAX",
+              "terminal": "B",
+              "at": "2025-08-10T16:40:00"
+            },
+            "arrival": {
+              "iataCode": "LIS",
+              "terminal": "1",
+              "at": "2025-08-11T11:45:00"
+            },
+            "carrierCode": "TP",
+            "number": "248",
+            "aircraft": {
+              "code": "339"
+            },
+            "operating": {
+              "carrierCode": "TP"
+            },
+            "duration": "PT11H5M",
+            "id": "5",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          },
+          {
+            "departure": {
+              "iataCode": "LIS",
+              "terminal": "1",
+              "at": "2025-08-11T16:05:00"
+            },
+            "arrival": {
+              "iataCode": "LHR",
+              "terminal": "2",
+              "at": "2025-08-11T18:50:00"
+            },
+            "carrierCode": "TP",
+            "number": "1364",
+            "aircraft": {
+              "code": "32N"
+            },
+            "operating": {
+              "carrierCode": "TP"
+            },
+            "duration": "PT2H45M",
+            "id": "6",
+            "numberOfStops": 0,
+            "blacklistedInEU": false
+          }
+        ]
+      }
+    ],
+    "price": {
+      "currency": "EUR",
+      "total": "550.74",
+      "base": "252.00",
+      "fees": [
+        {
+          "amount": "0.00",
+          "type": "SUPPLIER"
+        },
+        {
+          "amount": "0.00",
+          "type": "TICKETING"
+        }
+      ],
+      "grandTotal": "550.74",
+      "additionalServices": [
+        {
+          "amount": "125.00",
+          "type": "CHECKED_BAGS"
+        }
+      ]
+    },
+    "pricingOptions": {
+      "fareType": [
+        "PUBLISHED"
+      ],
+      "includedCheckedBagsOnly": false
+    },
+    "validatingAirlineCodes": [
+      "TP"
+    ],
+    "travelerPricings": [
+      {
+        "travelerId": "1",
+        "fareOption": "STANDARD",
+        "travelerType": "ADULT",
+        "price": {
+          "currency": "EUR",
+          "total": "275.37",
+          "base": "126.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "5",
+            "cabin": "ECONOMY",
+            "fareBasis": "KL0DSI05",
+            "brandedFare": "DISCOUNT",
+            "brandedFareLabel": "DISCOUNT",
+            "class": "K",
+            "includedCheckedBags": {
+              "quantity": 0
+            },
+            "includedCabinBags": {
+              "quantity": 1
+            },
+            "amenities": [
+              {
+                "description": "FIRST BAG UP TO 23KG AND 158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND BAG UP TO 23KG AND158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "EXTRA LEG ROOM OR FRONT SEAT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SEAT RESERVATION",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "MEAL 1",
+                "isChargeable": false,
+                "amenityType": "MEAL",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "6",
+            "cabin": "ECONOMY",
+            "fareBasis": "KL0DSI05",
+            "brandedFare": "DISCOUNT",
+            "brandedFareLabel": "DISCOUNT",
+            "class": "K",
+            "includedCheckedBags": {
+              "quantity": 0
+            },
+            "includedCabinBags": {
+              "quantity": 1
+            },
+            "amenities": [
+              {
+                "description": "FIRST BAG UP TO 23KG AND 158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND BAG UP TO 23KG AND158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "EXTRA LEG ROOM OR FRONT SEAT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SEAT RESERVATION",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "MEAL 1",
+                "isChargeable": false,
+                "amenityType": "MEAL",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "travelerId": "2",
+        "fareOption": "STANDARD",
+        "travelerType": "CHILD",
+        "price": {
+          "currency": "EUR",
+          "total": "275.37",
+          "base": "126.00"
+        },
+        "fareDetailsBySegment": [
+          {
+            "segmentId": "5",
+            "cabin": "ECONOMY",
+            "fareBasis": "KL0DSI05",
+            "brandedFare": "DISCOUNT",
+            "brandedFareLabel": "DISCOUNT",
+            "class": "K",
+            "amenities": [
+              {
+                "description": "FIRST BAG UP TO 23KG AND 158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND BAG UP TO 23KG AND158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "EXTRA LEG ROOM OR FRONT SEAT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SEAT RESERVATION",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "MEAL 1",
+                "isChargeable": false,
+                "amenityType": "MEAL",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          },
+          {
+            "segmentId": "6",
+            "cabin": "ECONOMY",
+            "fareBasis": "KL0DSI05",
+            "brandedFare": "DISCOUNT",
+            "brandedFareLabel": "DISCOUNT",
+            "class": "K",
+            "amenities": [
+              {
+                "description": "FIRST BAG UP TO 23KG AND 158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SECOND BAG UP TO 23KG AND158CM",
+                "isChargeable": true,
+                "amenityType": "BAGGAGE",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "EXTRA LEG ROOM OR FRONT SEAT",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "SEAT RESERVATION",
+                "isChargeable": true,
+                "amenityType": "PRE_RESERVED_SEAT",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              },
+              {
+                "description": "MEAL 1",
+                "isChargeable": false,
+                "amenityType": "MEAL",
+                "amenityProvider": {
+                  "name": "BrandedFare"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

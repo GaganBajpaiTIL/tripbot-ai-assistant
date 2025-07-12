@@ -143,6 +143,7 @@ class BedrockLlamaAdapter(LLMAdapter):
             logger.debug(f"Sending request to model {model_id} with body: {body[:500]}...")
             
             try:
+                #TODO: Use converse API instead.
                 response = self.client.invoke_model(
                     modelId=model_id,
                     body=body,
@@ -213,7 +214,7 @@ class TripPlannerBot:
             "payment_collection",
             "final_confirmation"
         ]
-        
+# TODO: Optimize system prompt to give more info to user in context of local information.        
         self.system_prompt = """You are a friendly and professional travel planning assistant. Your goal is to help users plan their perfect trip by collecting necessary information in a conversational manner.
 
 Key guidelines:
@@ -270,7 +271,7 @@ Once you have all information, summarize the trip details and ask for confirmati
         next_step = self._determine_next_step(current_step, user_message, collected_data)
         
         return response, next_step
-    
+    # TODO: Summarize some data, no need for full context.
     def _build_context_prompt(self, current_step: str, collected_data: dict, user_message: str) -> str:
         """Build context-aware prompt for the current conversation step"""
         base_prompt = self.system_prompt
