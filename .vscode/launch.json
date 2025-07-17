@@ -1,18 +1,21 @@
 {
     "version": "0.2.0",
     "configurations": [
+        
         {
-            "name": "Gunicorn: Launch TripBot",
+            "name": "FastAPI: Launch TripBot",
             "type": "debugpy",
             "request": "launch",
             "python": "${workspaceFolder}/venv/bin/python",
-            "module": "gunicorn",
+            "module": "uvicorn",
             "args": [
                 "tripbot.app:app",
-                "--config", "gunicorn.conf.py"
+                "--host", "0.0.0.0",
+                "--port", "50001",
+                "--reload"
             ],
             "envFile": "${workspaceFolder}/.env.example",
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/src",
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {

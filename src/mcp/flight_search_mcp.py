@@ -10,7 +10,7 @@ from typing import Any, Callable, Dict, List, Optional, Literal, Type, TypeVar, 
 
 import isodate
 from amadeus import Client, Location, ResponseError
-
+from inspect import signature
 T = TypeVar('T')  # Generic type for the return value of the function being retried
 
 logger = logging.getLogger(__name__)
@@ -117,7 +117,7 @@ def initialize_amadeus() -> Client:
     amadeus_client = Client(
         client_id=os.getenv('AMADEUS_CLIENT_ID', 'q8z8tQK3xV7zrIhPRd3NrRv3JA0noqI2'),
         client_secret=os.getenv('AMADEUS_CLIENT_SECRET', 'wyAAfcSGJFoM3X5f'),
-        log_level="error"
+        log_level="debug"
     )
     
     # Verify that credentials are provided
@@ -141,6 +141,8 @@ def initialize_amadeus() -> Client:
         raise
 
 
+# Valid travel classes as a module-level constant
+VALID_TRAVEL_CLASSES = ['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST']
 class FlightSearchMCP:
     """
     A class to handle flight search operations using the Amadeus API.
@@ -149,8 +151,6 @@ class FlightSearchMCP:
     and sort them based on various criteria.
     """
     
-    # Valid travel classes as a module-level constant
-    VALID_TRAVEL_CLASSES = ['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST']
 
     def __init__(self, client: Optional[Client] = None):
         """

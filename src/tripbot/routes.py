@@ -1,124 +1,160 @@
 import uuid
-import json
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import BaseModel
+
+# Import logging configuration
+from tripbot.config.logging_config import setup_logging
 import logging
-from flask import render_template, request, jsonify, session
-from app import app, db
+
+# Initialize logging
+setup_logging()
+logger = logging.getLogger(__name__)
+
+# Local imports
+from database import get_db
 from models import ChatSession
 from llm_adapters import TripPlannerBot
 from booking_service import BookingService
 
-logger = logging.getLogger(__name__)
+router = APIRouter()
 
+# Get the directory where this file is located
+current_dir = Path(__file__).parent
+templates = Jinja2Templates(directory=str(current_dir / ".." / ".." / "templates"))
 # Initialize services
 trip_bot = TripPlannerBot(preferred_llm="bedrock")  # Can be changed to "gemini" or "bedrock"
 booking_service = BookingService()
 
-@app.route('/')
-def index():
-    """Main chat interface"""
-    return render_template('index.html')
+class ChatRequest(BaseModel):
+    message: str
 
-@app.route('/api/chat', methods=['POST'])
-def chat():
+class ChatResponse(BaseModel):
+    message: str
+    step: str
+    data: dict
+
+@router.get('/')
+async def index(request: Request):
+    """Main chat interface"""
+    response = templates.TemplateResponse("index.html", {"request": request})
+    # Set session ID in response headers if not already present
+    if not request.headers.get('x-session-id'):
+        session_id = str(uuid.uuid4())
+        response.headers['x-session-id'] = session_id
+        logger.info(f"Set new session ID in response: {session_id}")
+    return response
+
+@router.post('/api/chat', response_model=ChatResponse)
+async def chat(
+    chat_request: ChatRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
     """Handle chat messages"""
-    try:
-        data = request.get_json()
-        user_message = data.get('message', '').strip()
+    user_message = chat_request.message.strip()
+    
+    if not user_message:
+        raise HTTPException(status_code=400, detail='Message cannot be empty')
         
-        if not user_message:
-            return jsonify({'error': 'Message cannot be empty'}), 400
+    # Get or create session
+    session_id = request.headers.get('x-session-id')  # Headers are case-insensitive
+    if not session_id:
+        session_id = str(uuid.uuid4())
+        logger.info(f"Generated new session ID: {session_id}")
         
-        # Get or create session
-        session_id = session.get('session_id')
-        if not session_id:
-            session_id = str(uuid.uuid4())
-            session['session_id'] = session_id
-        
-        # Get or create chat session
-        chat_session = ChatSession.query.filter_by(session_id=session_id).first()
-        if not chat_session:
-            chat_session = ChatSession(
-                session_id=session_id,
-                conversation_state={'messages': []},
-                current_step='greeting',
-                collected_data={}
-            )
-            db.session.add(chat_session)
-            db.session.commit()
-        
-        # Get conversation history
-        conversation_history = chat_session.conversation_state.get('messages', [])
-        
-        # Generate bot response
-        bot_response, next_step = trip_bot.generate_response(
-            user_message,
-            conversation_history,
-            chat_session.current_step,
-            chat_session.collected_data or {}
+    # Get or create chat session
+    chat_session = await db.get(ChatSession, session_id)
+    if not chat_session:
+        logger.info(f"Creating new chat session for session ID: {session_id}")
+        chat_session = ChatSession(
+            session_id=session_id,
+            conversation_state={'messages': []},
+            current_step='greeting',
+            collected_data={}
         )
+        db.add(chat_session)
+        await db.commit()
+        await db.refresh(chat_session)
         
-        # Extract and store relevant data from user message
-        updated_data = extract_data_from_message(
-            user_message, 
-            chat_session.current_step, 
-            chat_session.collected_data or {}
-        )
+    # Get conversation history
+    conversation_history = chat_session.conversation_state.get('messages', [])
+
+    # Generate bot response
+    bot_response, next_step, collected_data =  trip_bot.generate_response(
+        user_message,
+        conversation_history,
+        chat_session.current_step,
+        chat_session.collected_data or {}
+    )
         
-        # Update conversation history
-        conversation_history.append({'role': 'user', 'content': user_message})
-        conversation_history.append({'role': 'assistant', 'content': bot_response})
+    # Extract and store relevant data from user message
+    updated_data = extract_data_from_message(
+        user_message, 
+        chat_session.current_step, 
+        chat_session.collected_data or {}
+    )
         
-        # Update chat session
-        chat_session.conversation_state = {'messages': conversation_history}
-        chat_session.current_step = next_step
-        chat_session.collected_data = updated_data
-        db.session.commit()
         
-        # Handle booking and payment steps
-        additional_data = {}
-        if next_step == 'booking_confirmation':
-            # Calculate trip cost
-            cost_breakdown = booking_service.calculate_trip_cost(updated_data)
-            additional_data['cost_breakdown'] = cost_breakdown
-        elif next_step == 'final_confirmation':
-            # Create booking and process payment
-            booking = booking_service.create_booking(updated_data)
+    # Update conversation history
+    conversation_history.append({'role': 'user', 'content': user_message})
+    conversation_history.append({'role': 'assistant', 'content': bot_response})
+        
+    # Update chat session
+    chat_session.conversation_state = {'messages': conversation_history}
+    chat_session.current_step = next_step
+    chat_session.collected_data = updated_data
+    await db.commit()
+    await db.refresh(chat_session)
+        
+    # Handle booking and payment steps
+    additional_data = {}
+    if next_step == 'booking_confirmation':
+        # Calculate trip cost
+        cost_breakdown = await booking_service.calculate_trip_cost(updated_data)
+        additional_data['cost_breakdown'] = cost_breakdown
+    elif next_step == 'final_confirmation':
+        # Create booking and process payment
+            booking = await booking_service.create_booking(updated_data)
             if booking:
-                payment_result = booking_service.process_payment(booking.id, {})
+                payment_result = await booking_service.process_payment(booking.id, {})
                 additional_data['booking'] = booking.to_dict()
                 additional_data['payment'] = payment_result
         
-        return jsonify({
-            'response': bot_response,
-            'current_step': next_step,
-            'collected_data': updated_data,
-            'additional_data': additional_data
-        })
+    return JSONResponse({
+        'response': bot_response,
+        'current_step': next_step,
+        'collected_data': updated_data,
+        'additional_data': additional_data
+    })
         
-    except Exception as e:
-        logger.error(f"Error in chat endpoint: {e}")
-        return jsonify({'error': 'An error occurred processing your message'}), 500
 
-@app.route('/api/bookings', methods=['GET'])
-def get_bookings():
+@router.get('/api/bookings')
+async def get_bookings(db: AsyncSession = Depends(get_db)):
     """Get user's booking history"""
     try:
         email = request.args.get('email')
         if not email:
             return jsonify({'error': 'Email parameter required'}), 400
         
-        bookings = booking_service.get_bookings_by_email(email)
+        async with db.begin():
+            bookings = await booking_service.get_bookings_by_email(email)
         return jsonify([booking.to_dict() for booking in bookings])
         
     except Exception as e:
         logger.error(f"Error fetching bookings: {e}")
         return jsonify({'error': 'Failed to fetch bookings'}), 500
 
-@app.route('/api/booking/<int:booking_id>', methods=['GET'])
-def get_booking(booking_id):
+@router.get('/api/booking/{booking_id}')
+async def get_booking(booking_id: int, db: AsyncSession = Depends(get_db)):
     """Get specific booking details"""
     try:
-        booking = booking_service.get_booking_by_id(booking_id)
+        async with db.begin():
+            booking = await booking_service.get_booking_by_id(booking_id)
         if not booking:
             return jsonify({'error': 'Booking not found'}), 404
         
@@ -128,11 +164,12 @@ def get_booking(booking_id):
         logger.error(f"Error fetching booking: {e}")
         return jsonify({'error': 'Failed to fetch booking'}), 500
 
-@app.route('/api/booking/<int:booking_id>/cancel', methods=['POST'])
-def cancel_booking(booking_id):
+@router.post('/api/booking/{booking_id}/cancel')
+async def cancel_booking(booking_id: int, db: AsyncSession = Depends(get_db)):
     """Cancel a booking"""
     try:
-        result = booking_service.cancel_booking(booking_id)
+        async with db.begin():
+            result = await booking_service.cancel_booking(booking_id)
         if result['success']:
             return jsonify(result)
         else:
@@ -142,7 +179,7 @@ def cancel_booking(booking_id):
         logger.error(f"Error cancelling booking: {e}")
         return jsonify({'error': 'Failed to cancel booking'}), 500
 
-@app.route('/api/reset', methods=['POST'])
+@router.post('/api/reset')
 def reset_session():
     """Reset chat session"""
     try:
@@ -223,10 +260,58 @@ def extract_data_from_message(message: str, current_step: str, existing_data: di
     
     return data
 
-@app.errorhandler(404)
-def not_found(error):
-    return jsonify({'error': 'Not found'}), 404
+from fastapi import HTTPException, FastAPI
 
-@app.errorhandler(500)
-def internal_error(error):
-    return jsonify({'error': 'Internal server error'}), 500
+# Remove router-level exception handlers and handle errors directly in endpoints
+
+@router.get('/api/bookings')
+async def get_bookings(db: AsyncSession = Depends(get_db)):
+    """Get user's booking history"""
+    try:
+        email = request.args.get('email')
+        if not email:
+            raise HTTPException(status_code=400, detail='Email parameter required')
+        
+        async with db.begin():
+            bookings = await booking_service.get_bookings_by_email(email)
+        return [booking.to_dict() for booking in bookings]
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        logger.error(f"Error fetching bookings: {e}")
+        raise HTTPException(status_code=500, detail='Failed to fetch bookings')
+
+@router.get('/api/booking/{booking_id}')
+async def get_booking(booking_id: int, db: AsyncSession = Depends(get_db)):
+    """Get specific booking details"""
+    try:
+        async with db.begin():
+            booking = await booking_service.get_booking_by_id(booking_id)
+        if not booking:
+            raise HTTPException(status_code=404, detail='Booking not found')
+        
+        return booking.to_dict()
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        logger.error(f"Error fetching booking: {e}")
+        raise HTTPException(status_code=500, detail='Failed to fetch booking')
+
+@router.post('/api/booking/{booking_id}/cancel')
+async def cancel_booking(booking_id: int, db: AsyncSession = Depends(get_db)):
+    """Cancel a booking"""
+    try:
+        async with db.begin():
+            result = await booking_service.cancel_booking(booking_id)
+        if result['success']:
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result.get('error', 'Failed to cancel booking'))
+            
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        logger.error(f"Error cancelling booking: {e}")
+        raise HTTPException(status_code=500, detail='Failed to cancel booking')

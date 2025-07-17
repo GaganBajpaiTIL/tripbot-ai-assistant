@@ -1,25 +1,26 @@
-from app import db
+from database import Base
+from sqlalchemy import Column, Integer, String, Float, Date, DateTime, JSON
 from datetime import datetime
-from sqlalchemy import JSON
 
-class TripBooking(db.Model):
+class TripBooking(Base):
     """Model for storing trip bookings"""
-    id = db.Column(db.Integer, primary_key=True)
-    traveler_name = db.Column(db.String(100), nullable=False)
-    traveler_email = db.Column(db.String(120), nullable=False)
-    destination = db.Column(db.String(200), nullable=False)
-    departure_location = db.Column(db.String(200), nullable=False)
-    departure_date = db.Column(db.Date, nullable=False)
-    return_date = db.Column(db.Date, nullable=True)
-    travelers_count = db.Column(db.Integer, default=1)
-    trip_type = db.Column(db.String(50), default="round_trip")  # round_trip, one_way
-    budget = db.Column(db.Float, nullable=True)
-    preferences = db.Column(JSON, nullable=True)  # Store additional preferences as JSON
-    booking_status = db.Column(db.String(50), default="confirmed")
-    total_amount = db.Column(db.Float, nullable=True)
-    payment_status = db.Column(db.String(50), default="pending")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    __tablename__ = 'trip_bookings'
+    id = Column(Integer, primary_key=True)
+    traveler_name = Column(String(100), nullable=False)
+    traveler_email = Column(String(120), nullable=False)
+    destination = Column(String(200), nullable=False)
+    departure_location = Column(String(200), nullable=False)
+    departure_date = Column(Date, nullable=False)
+    return_date = Column(Date, nullable=True)
+    travelers_count = Column(Integer, default=1)
+    trip_type = Column(String(50), default="round_trip")  # round_trip, one_way
+    budget = Column(Float, nullable=True)
+    preferences = Column(JSON, nullable=True)  # Store additional preferences as JSON
+    booking_status = Column(String(50), default="confirmed")
+    total_amount = Column(Float, nullable=True)
+    payment_status = Column(String(50), default="pending")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def to_dict(self):
         """Convert booking to dictionary for JSON serialization"""
@@ -41,15 +42,16 @@ class TripBooking(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
-class ChatSession(db.Model):
+class ChatSession(Base):
     """Model for storing chat sessions and conversation state"""
-    id = db.Column(db.Integer, primary_key=True)
-    session_id = db.Column(db.String(100), unique=True, nullable=False)
-    conversation_state = db.Column(JSON, nullable=True)  # Store conversation state as JSON
-    current_step = db.Column(db.String(50), default="greeting")
-    collected_data = db.Column(JSON, nullable=True)  # Store collected trip data
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    __tablename__ = 'chat_sessions'
+    id = Column(Integer, primary_key=True)
+    session_id = Column(String(100), unique=True, nullable=False)
+    conversation_state = Column(JSON, nullable=True)  # Store conversation state as JSON
+    current_step = Column(String(50), default="greeting")
+    collected_data = Column(JSON, nullable=True)  # Store collected trip data
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def to_dict(self):
         """Convert session to dictionary for JSON serialization"""
