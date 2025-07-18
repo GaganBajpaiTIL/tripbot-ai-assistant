@@ -19,35 +19,42 @@ bind = "0.0.0.0:50001"
 
 
 
-# Worker processes
-#workers = multiprocessing.cpu_count() * 1 + 1
+# Worker configuration
+worker_class = 'gthread'  # Using gthread worker for better signal handling
 workers = 2
 threads = 2
-timeout = 30
+timeout = 1200
 keepalive = 2
-# Preloading as init seems to have a racing condition and db create.
-preload_app = True
+preload_app = True  # Keep preload enabled to ensure signal handlers are installed early 
+
+# Error handling
+max_requests = 1000  # Restart workers after this many requests
+max_requests_jitter = 50  # Add randomness to prevent all workers restarting at once
+
+# Memory management
+import resource
+
+# Enable core dumps for debugging SIGSEGV
+resource.setrlimit(resource.RLIMIT_CORE, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+
+
+# Logging configuration
+loglevel = 'info'
+accesslog = '-'
+errorlog = '-'
+capture_output = True
+enable_stdio_inheritance = True  # Capture output from subprocesses
 
 
 
 # Logging configuration
-log_dir = Path("logs")
-log_dir.mkdir(exist_ok=True)
-
-# Log file settings
-max_size = 100 * 1024 * 1024  # 100MB
-backup_count = 5
 log_format = '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
 
-# Set up log files
-access_log = log_dir / "access.log"
-error_log = log_dir / "error.log"
-
-# Ensure log files exist
-for log_file in [access_log, error_log]:
-    log_file.parent.mkdir(parents=True, exist_ok=True)
-    if not log_file.exists():
-        log_file.touch()
+# Log to stdout and stderr
+accesslog = "-"  # Log to stdout
+errorlog = "-"   # Log to stderr
+loglevel = "info"
+capture_output = True
 
 # Common logging configuration
 logconfig_dict = {
@@ -58,20 +65,20 @@ logconfig_dict = {
         'access': {'format': '%(message)s'}
     },
     'handlers': {
-        'error_file': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': str(error_log),
-            'maxBytes': max_size,
-            'backupCount': backup_count,
-            'formatter': 'standard'
-        },
-        'access_file': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': str(access_log),
-            'maxBytes': max_size,
-            'backupCount': backup_count,
-            'formatter': 'access'
-        },
+        #'error_file': {
+        #    'class': 'logging.handlers.RotatingFileHandler',
+        #    'filename': str(error_log),
+        #    'maxBytes': max_size,
+        #    'backupCount': backup_count,
+        #    'formatter': 'standard'
+        #},
+        #'access_file': {
+        #    'class': 'logging.handlers.RotatingFileHandler',
+        #    'filename': str(access_log),
+        #    'maxBytes': max_size,
+        #    'backupCount': backup_count,
+        #    'formatter': 'access'
+        #},
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'standard'
@@ -79,26 +86,24 @@ logconfig_dict = {
     },
     'loggers': {
         'gunicorn.error': {
-            'handlers': ['error_file', 'console'],
+            'handlers': ['console'],
             'level': 'DEBUG' if os.environ.get("ENVIRONMENT") != "PRODUCTION" else 'INFO',
             'propagate': False
         },
         'gunicorn.access': {
-            'handlers': ['access_file'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': False
         }
     },
     'root': {
-        'handlers': ['error_file', 'console'],
+        'handlers': ['console'],
         'level': 'DEBUG' if os.environ.get("ENVIRONMENT") != "PRODUCTION" else 'INFO'
     }
 }
 
 # Common settings
 loglevel = "debug" if os.environ.get("ENVIRONMENT") != "PRODUCTION" else "info"
-accesslog = str(access_log)
-errorlog = str(error_log)
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 
 # Development settings
@@ -112,5 +117,3 @@ else:
     worker_class = "gthread"
     workers = multiprocessing.cpu_count() * 1 + 1
     threads = 2
-    max_requests = 1000
-    max_requests_jitter = 50

@@ -9,13 +9,13 @@
             "python": "${workspaceFolder}/venv/bin/python",
             "module": "uvicorn",
             "args": [
-                "tripbot.app:app",
+                "main:app",
                 "--host", "0.0.0.0",
                 "--port", "50001",
                 "--reload"
             ],
             "envFile": "${workspaceFolder}/.env.example",
-            "cwd": "${workspaceFolder}/src",
+            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {

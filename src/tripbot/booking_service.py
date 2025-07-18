@@ -29,7 +29,7 @@ class BookingService:
         ]
         
         # Initialize FlightSearchMCP instance
-        #self.flight_search = FlightSearchMCP()
+        self.flight_search = FlightSearchMCP()
     
     def calculate_trip_cost(self, trip_data: Dict[str, Any]) -> Dict[str, Any]:
         """Calculate estimated trip cost based on collected data"""
