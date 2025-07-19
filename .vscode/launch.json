@@ -6,7 +6,6 @@
             "name": "FastAPI: Launch TripBot",
             "type": "debugpy",
             "request": "launch",
-            "python": "${workspaceFolder}/venv/bin/python",
             "module": "uvicorn",
             "args": [
                 "main:app",

@@ -3,6 +3,7 @@ import sys
 import signal
 from pathlib import Path
 from signal import SIGINT, SIGTERM
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,7 +26,7 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 # Import database configuration
-from database import Base, engine, SessionLocal, get_db
+from tripbot.database import Base, engine, SessionLocal, get_db
 
 # Signal handlers
 def handle_shutdown(signum, frame):
@@ -35,8 +36,25 @@ def handle_shutdown(signum, frame):
 signal.signal(SIGINT, handle_shutdown)
 signal.signal(SIGTERM, handle_shutdown)
 
-app = FastAPI(title="TripBot AI Assistant", version="0.1.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Handles startup and shutdown events for the application.
+    - Initializes the database on startup.
+    - Disposes of the database connection on shutdown.
+    """
+    # Startup: Initialize database
+    # Import models here to avoid circular imports
+    from tripbot.database import Base
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    logger.info("Database initialized")
+    yield
+    # Shutdown: Dispose of the database connection
+    await engine.dispose()
+    logger.info("Database connection closed")
 
+app = FastAPI(title="TripBot AI Assistant", version="0.1.0", lifespan=lifespan)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -45,21 +63,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Initialize database
-@app.on_event("startup")
-async def startup_event():
-    # Import models here to avoid circular imports
-    from models import Base
-    # Create tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    logger.info("Database initialized")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    await engine.dispose()
-    logger.info("Database connection closed")
 
 # Mount static files
 static_dir = os.path.join(project_root, "static")
@@ -80,7 +83,7 @@ async def serve_static(file_path: str):
     raise HTTPException(status_code=404, detail="File not found")
 
 # Import routes
-from routes import router
+from tripbot.routes import router
 
 # Include routes
 app.include_router(router)
@@ -88,4 +91,3 @@ app.include_router(router)
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run("tripbot.app:app", host='0.0.0.0', port=50001, reload=True)
-

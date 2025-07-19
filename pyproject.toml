@@ -20,6 +20,7 @@ dependencies = [
     "pip-system-certs>=2.1.0",
     "isodate>=0.7.0",
     "aiosqlite>=0.19.0",
+    "jinja2>=3.1.6",
 ]
 
 [tool.setuptools]

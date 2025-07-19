@@ -1,4 +1,4 @@
-from database import Base
+from tripbot.database import Base
 from sqlalchemy import Column, Integer, String, Float, Date, DateTime, JSON
 from datetime import datetime
 

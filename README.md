@@ -24,7 +24,7 @@ The application features a modern dark theme with:
 
 ### Prerequisites
 
-- Python 3.11 or higher
+- Python 3.12 or higher
 - OpenAI API key OR Google Gemini API key
 
 ### Setup
@@ -35,17 +35,36 @@ The application features a modern dark theme with:
    cd tripbot
    ```
 
-2. **Install dependencies**
+2. **Create and activate a virtual environment using `uv`**
    ```bash
-   pip install -r pyproject.toml
-   ```
-   
-   Or if using the project file:
-   ```bash
-   pip install -e .
+   uv venv 
+   source .venv/bin/activate
    ```
 
-3. **Set up environment variables**
+3. **Install dependencies**
+   ```bash
+   uv sync
+   ```
+
+4. **VS Code Users**
+
+   > **Note:**  
+   > If you use VS Code, set your default Python interpreter to the virtual environment:
+   > 1. Open Command Palette (`Cmd+Shift+P`)
+   > 2. Select **Python: Select Interpreter**
+   > 3. Choose `.venv/bin/python` from your workspace folder
+
+   This ensures all Python commands and debugging use your project’s virtual environment.
+
+## Development
+
+To run the app:
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 50001
+```
+
+5. **Set up environment variables**
    Create a `.env` file or set environment variables:
    ```bash
    # Required: At least one AI service
@@ -62,18 +81,19 @@ The application features a modern dark theme with:
    SESSION_SECRET=your-secret-key-here
    ```
 
-4. **Run the application**
-   ```bash
-   python main.py
-   ```
+6. **Run the application**
    
-   Or using Gunicorn (production):
+   Using Uvicorn (development):
    ```bash
-   gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app
+   uvicorn main:app --reload
+   
+   Or using uvocorn (production):
+   ```bash
+   uvcorn --bind 0.0.0.0:50001 --reuse-port --reload main:app
    ```
 
-5. **Access the application**
-   Open your browser and navigate to `http://localhost:5000`
+7. **Access the application**
+   Open your browser and navigate to `http://localhost:50001`
 
 ## API Keys Setup
 
@@ -103,19 +123,31 @@ The application features a modern dark theme with:
 ## Project Structure
 
 ```
-├── app.py                 # Flask application setup and configuration
-├── main.py               # Application entry point
-├── models.py             # Database models (TripBooking, ChatSession)
-├── routes.py             # API endpoints and request handling
-├── llm_adapters.py       # AI service integrations (OpenAI, Gemini)
-├── booking_service.py    # Trip booking and cost calculation logic
-├── pyproject.toml        # Python project dependencies
+├── main.py                          # Application entry point
+├── src/
+│   └── tripbot/
+│       ├── __init__.py                # Package initializer
+│       ├── app.py                     # FastAPI application setup and configuration
+│       ├── models.py                  # Database models (TripBooking, ChatSession)
+│       ├── routes.py                  # API endpoints and request handling
+│       ├── llm_adapters.py            # AI service integrations (OpenAI, Gemini)
+│       ├── booking_service.py         # Trip booking and cost calculation logic
+│       ├── database.py                # Database connection and session management
+│       ├── signal_handlers.py         # Signal handling for graceful shutdown
+│       └── config/
+│           ├── __init__.py            # Config package initializer
+│           └── logging_config.py      # Logging configuration
 ├── templates/
-│   └── index.html        # Main chat interface template
+│   └── index.html                     # Main chat interface template
 ├── static/
-│   ├── chat.js           # Frontend JavaScript functionality
-│   └── style.css         # Custom styling and responsive design
-└── README.md             # This file
+│   ├── chat.js                        # Frontend JavaScript functionality
+│   └── style.css                      # Custom styling and responsive design
+├── tests/
+│   └── unit/
+│       └── mcp/                       # Unit tests for MCP modules
+├── pyproject.toml                     # Python project dependencies
+├── README.md                          # This file
+└── tripbot.db                         # SQLite database file
 ```
 
 ## How It Works
