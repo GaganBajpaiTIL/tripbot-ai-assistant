@@ -1,7 +1,20 @@
 {
     "version": "0.2.0",
     "configurations": [
-        
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env.example",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYTHONUNBUFFERED": "1"
+            }
+        },
         {
             "name": "FastAPI: Launch TripBot",
             "type": "debugpy",
@@ -9,8 +22,10 @@
             "module": "uvicorn",
             "args": [
                 "main:app",
-                "--host", "0.0.0.0",
-                "--port", "50001",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "50001",
                 "--reload"
             ],
             "envFile": "${workspaceFolder}/.env.example",

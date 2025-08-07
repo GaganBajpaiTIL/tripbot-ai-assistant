@@ -1,0 +1,16 @@
+ALWAYS respond in the exact JSON format specified below.
+{
+    "message": "",
+    "UserData": {
+        "UserName": "",
+        "Email": "",
+        "Destination": "",
+        "DepartureLocation": "",
+        "TravelDates": "",
+        "NumberofTravelers": "",
+        "TripType": "",
+        "BudgetPreferences": "",
+        "SpecialPreferences": ""
+    },
+    "question": ""
+}

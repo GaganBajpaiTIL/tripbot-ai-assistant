@@ -48,7 +48,7 @@ def call_with_retry(
     logger.debug(f"Calling {func.__name__} with {param_count} parameters: {list(kwargs.keys())}")
     
     delay = initial_delay
-    last_exception = None
+    last_exception = BaseException("Don't Know")
 
     for attempt in range(max_retries + 1):
         try:
@@ -115,8 +115,8 @@ def initialize_amadeus() -> Client:
         Client: Authenticated Amadeus client instance
     """
     amadeus_client = Client(
-        client_id=os.getenv('AMADEUS_CLIENT_ID', 'q8z8tQK3xV7zrIhPRd3NrRv3JA0noqI2'),
-        client_secret=os.getenv('AMADEUS_CLIENT_SECRET', 'wyAAfcSGJFoM3X5f'),
+        client_id=os.getenv('AMADEUS_CLIENT_ID', 'CZ7m9PsAFkhLW59r7W0BkRhLiK34UlaW'),
+        client_secret=os.getenv('AMADEUS_CLIENT_SECRET', 'Ex73FGBI9AeOC50M'),
         log_level="debug"
     )
     
@@ -128,18 +128,17 @@ def initialize_amadeus() -> Client:
         )
     
     # Test the connection
-    try:
-        response = amadeus_client.reference_data.locations.get(
-            keyword='LON',
-            subType=Location.AIRPORT
-        )
-        logger.info("Successfully connected to Amadeus API")
-        logger.debug("Amadeus API connection response: %s", response.data)
-        return amadeus_client
-    except ResponseError as error:
-        logger.error(f"Failed to initialize Amadeus client: {error}")
-        raise
-
+    # try:
+    #     response = amadeus_client.reference_data.locations.get(
+    #         keyword='LON',
+    #         subType=Location.AIRPORT
+    #     )
+    #     logger.info("Successfully connected to Amadeus API")
+    #     logger.debug("Amadeus API connection response: %s", response.data)
+    # except ResponseError as error:
+    #     logger.error(f"Failed to initialize Amadeus client: {error}")
+    #     raise
+    return amadeus_client
 
 # Valid travel classes as a module-level constant
 VALID_TRAVEL_CLASSES = ['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST']

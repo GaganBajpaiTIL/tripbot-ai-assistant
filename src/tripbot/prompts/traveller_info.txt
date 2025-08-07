@@ -1,0 +1,31 @@
+{
+  "traveller": {
+    "firstName": 
+    "lastName":
+    "dateOfBirth": 
+    "gender": 
+    "contact": {
+      "email": 
+      "phone": 
+    },
+    "passport": {
+      "number": 
+      "country": 
+      "expiry_date": 
+    },
+    "preferences": {
+      "seat": "window",
+      "meal": "vegetarian",
+      "baggage": {
+        "checked_in_kg": 
+        "hand_baggage_kg": 
+      }
+    },
+    "frequent_flyer": {
+      "airline": 
+      "membership_number": 
+    },
+    "special_assistance": 
+  }
+}
+ 

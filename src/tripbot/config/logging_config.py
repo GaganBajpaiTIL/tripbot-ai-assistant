@@ -84,6 +84,7 @@ def setup_logging(default_level=logging.INFO):
         logging.getLogger().setLevel(logging.DEBUG)
         logging.getLogger("tripbot").setLevel(logging.DEBUG)
         logging.getLogger("mcp").setLevel(logging.DEBUG)
+        logging.getLogger("aiosqlite").setLevel(logging.WARNING)
     else:
         logging.getLogger().setLevel(logging.INFO)
         logging.getLogger("tripbot").setLevel(logging.INFO)

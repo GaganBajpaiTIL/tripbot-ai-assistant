@@ -1,0 +1,1 @@
+Summarize all collected information and ask for confirmation before proceeding to booking.

@@ -85,6 +85,11 @@ class TripBotChat {
             
             // Add bot response
             this.addMessage(data.response, 'bot');
+
+            // If there's a follow-up question, display it
+            if (data.question) {
+                this.addMessage(`Question: ${data.question}`, 'bot');
+            }
             
             // Update conversation state
             this.currentStep = data.current_step;
@@ -220,7 +225,7 @@ class TripBotChat {
     
     formatFieldLabel(key) {
         const labels = {
-            'traveler_name': 'Name',
+            'traveler_name': 'UserName',
             'traveler_email': 'Email',
             'destination': 'Destination',
             'departure_location': 'Departure',

@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 # Local imports
 from database import get_db
 from models import ChatSession
-from llm_adapters import TripPlannerBot
+from llm_adapters import BOT_TEXT_RESPONSE_KEY, QUESTION_KEY, USER_DATA_KEY
+from trip_planner_bot import TripPlannerBot
 from booking_service import BookingService
 
 router = APIRouter()
@@ -125,12 +126,24 @@ async def chat(
                 additional_data['booking'] = booking.to_dict()
                 additional_data['payment'] = payment_result
         
-    return JSONResponse({
-        'response': bot_response,
+    response_data = {
+        'response': bot_response.get(BOT_TEXT_RESPONSE_KEY, ""),
         'current_step': next_step,
         'collected_data': updated_data,
         'additional_data': additional_data
-    })
+    }
+    
+    # Only add question if it exists in bot_response
+    if QUESTION_KEY in bot_response:
+        response_data[QUESTION_KEY] = bot_response[QUESTION_KEY]
+        
+    # Only add tool_call and tool_parameters if tool_call exists in bot_response
+    if "tool_call" in bot_response:
+        response_data['tool_call'] = bot_response["tool_call"]
+        if "tool_parameters" in bot_response:
+            response_data['tool_parameters'] = bot_response["tool_parameters"]
+    
+    return JSONResponse(response_data)
         
 
 @router.get('/api/bookings')
