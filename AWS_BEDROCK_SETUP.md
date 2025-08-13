@@ -1,4 +1,4 @@
-# AWS Bedrock Llama Setup Guide
+# AWS Bedrock Llama Setup Guide (Go in the end)
 
 ## Overview
 AWS Bedrock provides access to foundation models including Meta's Llama models. This guide helps you set up Bedrock with your TripBot application.
