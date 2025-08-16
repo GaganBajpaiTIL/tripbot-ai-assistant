@@ -1,8 +1,11 @@
+import debugpy
+debugpy.listen(("0.0.0.0", 5678))
+debugpy.wait_for_client()
 import json
 import os
 from langchain_aws import BedrockLLM
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import LLMChain
 
@@ -14,7 +17,8 @@ def load_or_create_db(name):
     path = f"{name}_memory"
     if os.path.exists(path):
         return FAISS.load_local(path, embeddings, allow_dangerous_deserialization=True)
-    return FAISS.from_texts([], embeddings)
+    texts = ["",name]
+    return FAISS.from_texts(texts, embeddings)
 
 airline_memory = load_or_create_db("airline")
 payment_memory = load_or_create_db("payment")

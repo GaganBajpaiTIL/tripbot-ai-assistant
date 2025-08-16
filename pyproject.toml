@@ -25,6 +25,8 @@ dependencies = [
     "langchain-community>=0.3.27",
     "langchain-aws>=0.2.30",
     "sentence-transformers>=5.1.0",
+    "debugpy>=1.8.16",
+    "langchain-huggingface>=0.3.1",
 ]
 
 [tool.setuptools]
