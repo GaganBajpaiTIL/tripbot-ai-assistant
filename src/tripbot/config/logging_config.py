@@ -31,6 +31,15 @@ def setup_logging(default_level=logging.INFO):
                 "level": "WARNING",
                 "formatter": "standard",
                 "stream": "ext://sys.stderr"
+            },
+            "file": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "level": "DEBUG",
+                "formatter": "standard",
+                "filename": str(log_dir / "tripbot.log"),
+                "maxBytes": 10485760,  # 10MB
+                "backupCount": 5,
+                "encoding": "utf8"
             }
         },
         "loggers": {
@@ -41,6 +50,11 @@ def setup_logging(default_level=logging.INFO):
             },
             "mcp": {
                 "handlers": ["stdout", "stderr"],
+                "level": "DEBUG",
+                "propagate": False
+            },
+            "utils": {
+                "handlers": ["file"],
                 "level": "DEBUG",
                 "propagate": False
             },

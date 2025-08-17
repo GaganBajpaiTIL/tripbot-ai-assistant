@@ -7,7 +7,6 @@ from langchain_aws import BedrockLLM
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain
 # Import logging configuration
 from tripbot.config.logging_config import setup_logging
 import logging
@@ -58,9 +57,8 @@ payment_prompt = ChatPromptTemplate.from_messages([
     {memory}"""),
     ("human", "{input}")
 ])
-
-airline_chain = LLMChain(llm=llm, prompt=airline_prompt)
-payment_chain = LLMChain(llm=llm, prompt=payment_prompt)
+airline_chain = airline_prompt | llm
+payment_chain = payment_prompt | llm
 
 # Simulated tools
 def search_flights(destination, date):
@@ -80,25 +78,21 @@ def confirm_payment(transaction_id):
     return {"status": "confirmed", "transaction_id": transaction_id}
 
 # Agent logic
-def run_airline_agent(user_input):
-    results = airline_memory.similarity_search(user_input, k=3)
+# Update agent invocation
+def run_agent(chain, memory, user_input, agent_type):
+    results = memory.similarity_search(user_input, k=3)
     memory_text = "\n".join([r.page_content for r in results])
-    output = airline_chain.invoke({"input": user_input, "memory": memory_text})
-    logger.debug(f"Received response in airline chain: {json.dumps(output, indent=2)[:50000]}...")
-    airline_memory.add_texts([user_input + "\n" + str(output)])
-    airline_memory.save_local("airline_memory")
-    logger.debug(f"Updated airline memory: {json.dumps(output, indent=2)[:50000]}...")
-    return handle_tool_call(str(output), "airline")
+    output = chain.invoke({"input": user_input, "memory": memory_text})
+    logger.debug(f"{agent_type} chain output: %s", json.dumps(output, indent=2, ensure_ascii=False)[:5000])
+    memory.add_texts([user_input + "\n" + str(output)])
+    memory.save_local(f"{agent_type}_memory")
+    return handle_tool_call(str(output), agent_type)
+
+def run_airline_agent(user_input):
+    return run_agent(airline_chain, airline_memory, user_input, "airline")
 
 def run_payment_agent(user_input):
-    results = payment_memory.similarity_search(user_input, k=3)
-    memory_text = "\n".join([r.page_content for r in results])
-    output = payment_chain.invoke({"input": user_input, "memory": memory_text})
-    logger.debug(f"Output in payment chain : {json.dumps(output, indent=2)[:50000]}...")
-    payment_memory.add_texts([user_input + "\n" + str(output)])
-    payment_memory.save_local("payment_memory")
-    return handle_tool_call(str(output), "payment")
-
+    return run_agent(payment_chain, payment_memory, user_input, "payment")
 # Tool call handler
 def handle_tool_call(json_str, agent_type):
     try:
