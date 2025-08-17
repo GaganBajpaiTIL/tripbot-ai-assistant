@@ -77,18 +77,18 @@ def confirm_payment(transaction_id):
 def run_airline_agent(user_input):
     results = airline_memory.similarity_search(user_input, k=3)
     memory_text = "\n".join([r.page_content for r in results])
-    output = airline_chain.run(input=user_input, memory=memory_text)
-    airline_memory.add_texts([user_input + "\n" + output])
+    output = airline_chain.invoke({"input": user_input, "memory": memory_text})
+    airline_memory.add_texts([user_input + "\n" + str(output)])
     airline_memory.save_local("airline_memory")
-    return handle_tool_call(output, "airline")
+    return handle_tool_call(str(output), "airline")
 
 def run_payment_agent(user_input):
     results = payment_memory.similarity_search(user_input, k=3)
     memory_text = "\n".join([r.page_content for r in results])
-    output = payment_chain.run(input=user_input, memory=memory_text)
-    payment_memory.add_texts([user_input + "\n" + output])
+    output = payment_chain.invoke({"input": user_input, "memory": memory_text})
+    payment_memory.add_texts([user_input + "\n" + str(output)])
     payment_memory.save_local("payment_memory")
-    return handle_tool_call(output, "payment")
+    return handle_tool_call(str(output), "payment")
 
 # Tool call handler
 def handle_tool_call(json_str, agent_type):
