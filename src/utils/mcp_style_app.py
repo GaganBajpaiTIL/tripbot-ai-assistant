@@ -8,7 +8,13 @@ from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import LLMChain
+# Import logging configuration
+from tripbot.config.logging_config import setup_logging
+import logging
 
+# Initialize logging
+setup_logging()
+logger = logging.getLogger(__name__)
 
 # Local embeddings for both agents
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -78,14 +84,17 @@ def run_airline_agent(user_input):
     results = airline_memory.similarity_search(user_input, k=3)
     memory_text = "\n".join([r.page_content for r in results])
     output = airline_chain.invoke({"input": user_input, "memory": memory_text})
+    logger.debug(f"Received response in airline chain: {json.dumps(output, indent=2)[:50000]}...")
     airline_memory.add_texts([user_input + "\n" + str(output)])
     airline_memory.save_local("airline_memory")
+    logger.debug(f"Updated airline memory: {json.dumps(output, indent=2)[:50000]}...")
     return handle_tool_call(str(output), "airline")
 
 def run_payment_agent(user_input):
     results = payment_memory.similarity_search(user_input, k=3)
     memory_text = "\n".join([r.page_content for r in results])
     output = payment_chain.invoke({"input": user_input, "memory": memory_text})
+    logger.debug(f"Output in payment chain : {json.dumps(output, indent=2)[:50000]}...")
     payment_memory.add_texts([user_input + "\n" + str(output)])
     payment_memory.save_local("payment_memory")
     return handle_tool_call(str(output), "payment")
