@@ -84,9 +84,11 @@ async def serve_static(file_path: str):
 
 # Import routes
 from tripbot.routes import router
+from tripbot.travel_router import travel_router
 
 # Include routes
 app.include_router(router)
+app.include_router(travel_router)
 
 if __name__ == '__main__':
     import uvicorn

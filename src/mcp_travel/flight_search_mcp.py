@@ -45,10 +45,11 @@ def call_with_retry(
     
     # Log function call with parameter count and names (but not values for security)
     param_count = len(signature(func).parameters)
-    logger.debug(f"Calling {func.__name__} with {param_count} parameters: {list(kwargs.keys())}")
+    func_name = getattr(func, '__name__', 'mocked_function')
+    logger.debug(f"Calling {func_name} with {param_count} parameters: {list(kwargs.keys())}")
     
     delay = initial_delay
-    last_exception = BaseException("Don't Know")
+    last_exception = BaseException("Don't Know in flight search")
 
     for attempt in range(max_retries + 1):
         try:
@@ -187,6 +188,34 @@ class FlightSearchMCP:
         """Sort flights by price (cheapest first)."""
         return float(flight['price']['total'])
 
+    @staticmethod
+    def sort_by_arrival_time(flight: Dict[str, Any]) -> str:
+        """
+        Sort flights by arrival time (earliest first).
+        
+        Args:
+            flight: Flight data dictionary
+            
+        Returns:
+            str: Arrival time string in ISO 8601 format for sorting
+        """
+        # Get the arrival time of the last segment of the first itinerary
+        segments = flight['itineraries'][0]['segments']
+        return segments[-1]['arrival']['at']
+
+    @staticmethod
+    def sort_by_departure_time(flight: Dict[str, Any]) -> str:
+        """
+        Sort flights by departure time (earliest first).
+        
+        Args:
+            flight: Flight data dictionary
+            
+        Returns:
+            str: Departure time string in ISO 8601 format for sorting
+        """
+        # Get the departure time of the first segment of the first itinerary
+        return flight['itineraries'][0]['segments'][0]['departure']['at']
 
     def search_flights(
         self,

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional, Callable
 from models import TripBooking
 from database import SessionLocal
-from mcp.flight_search_mcp import FlightSearchMCP
+from mcp_travel.flight_search_mcp import FlightSearchMCP
 
 logger = logging.getLogger(__name__)
 
@@ -252,4 +252,3 @@ class BookingService:
         except Exception as e:
             logger.error(f"Error cancelling booking: {e}")
             return {'success': False, 'error': 'Failed to cancel booking'}
-

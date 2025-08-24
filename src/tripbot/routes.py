@@ -20,6 +20,7 @@ from database import get_db
 from models import ChatSession
 from llm_adapters import BOT_TEXT_RESPONSE_KEY, QUESTION_KEY, USER_DATA_KEY
 from trip_planner_bot import TripPlannerBot
+from mcp_travel.flight_search_mcp import FlightSearchMCP
 from booking_service import BookingService
 
 router = APIRouter()
@@ -50,6 +51,10 @@ async def index(request: Request):
         logger.info(f"Set new session ID in response: {session_id}")
     return response
 
+@router.get('/templates/flight_search_widget.html')
+async def flight_search_widget(request: Request):
+    return templates.TemplateResponse("flight_search_widget.html", {"request": request})
+
 @router.post('/api/chat', response_model=ChatResponse)
 async def chat(
     chat_request: ChatRequest,
@@ -70,13 +75,25 @@ async def chat(
         
     # Get or create chat session
     chat_session = await db.get(ChatSession, session_id)
+    #TODO: Set up observer on collected_data
     if not chat_session:
         logger.info(f"Creating new chat session for session ID: {session_id}")
         chat_session = ChatSession(
             session_id=session_id,
             conversation_state={'messages': []},
             current_step='greeting',
-            collected_data={}
+              collected_data = {
+                'timestamp': datetime.now().isoformat(),
+                'UserName': "",
+                'email': "",
+                'destination': "",
+                'departure_location': "",
+                'dates': "",
+                'travelers_count': "",
+                'trip_type': "",
+                'budget': "",
+                'preferences': {}
+            }
         )
         db.add(chat_session)
         await db.commit()
@@ -145,53 +162,6 @@ async def chat(
     
     return JSONResponse(response_data)
         
-
-@router.get('/api/bookings')
-async def get_bookings(db: AsyncSession = Depends(get_db)):
-    """Get user's booking history"""
-    try:
-        email = request.args.get('email')
-        if not email:
-            return jsonify({'error': 'Email parameter required'}), 400
-        
-        async with db.begin():
-            bookings = await booking_service.get_bookings_by_email(email)
-        return jsonify([booking.to_dict() for booking in bookings])
-        
-    except Exception as e:
-        logger.error(f"Error fetching bookings: {e}")
-        return jsonify({'error': 'Failed to fetch bookings'}), 500
-
-@router.get('/api/booking/{booking_id}')
-async def get_booking(booking_id: int, db: AsyncSession = Depends(get_db)):
-    """Get specific booking details"""
-    try:
-        async with db.begin():
-            booking = await booking_service.get_booking_by_id(booking_id)
-        if not booking:
-            return jsonify({'error': 'Booking not found'}), 404
-        
-        return jsonify(booking.to_dict())
-        
-    except Exception as e:
-        logger.error(f"Error fetching booking: {e}")
-        return jsonify({'error': 'Failed to fetch booking'}), 500
-
-@router.post('/api/booking/{booking_id}/cancel')
-async def cancel_booking(booking_id: int, db: AsyncSession = Depends(get_db)):
-    """Cancel a booking"""
-    try:
-        async with db.begin():
-            result = await booking_service.cancel_booking(booking_id)
-        if result['success']:
-            return jsonify(result)
-        else:
-            return jsonify(result), 400
-            
-    except Exception as e:
-        logger.error(f"Error cancelling booking: {e}")
-        return jsonify({'error': 'Failed to cancel booking'}), 500
-
 @router.post('/api/reset')
 def reset_session():
     """Reset chat session"""
@@ -272,59 +242,3 @@ def extract_data_from_message(message: str, current_step: str, existing_data: di
         logger.error(f"Error extracting data from message: {e}")
     
     return data
-
-from fastapi import HTTPException, FastAPI
-
-# Remove router-level exception handlers and handle errors directly in endpoints
-
-@router.get('/api/bookings')
-async def get_bookings(db: AsyncSession = Depends(get_db)):
-    """Get user's booking history"""
-    try:
-        email = request.args.get('email')
-        if not email:
-            raise HTTPException(status_code=400, detail='Email parameter required')
-        
-        async with db.begin():
-            bookings = await booking_service.get_bookings_by_email(email)
-        return [booking.to_dict() for booking in bookings]
-        
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        logger.error(f"Error fetching bookings: {e}")
-        raise HTTPException(status_code=500, detail='Failed to fetch bookings')
-
-@router.get('/api/booking/{booking_id}')
-async def get_booking(booking_id: int, db: AsyncSession = Depends(get_db)):
-    """Get specific booking details"""
-    try:
-        async with db.begin():
-            booking = await booking_service.get_booking_by_id(booking_id)
-        if not booking:
-            raise HTTPException(status_code=404, detail='Booking not found')
-        
-        return booking.to_dict()
-        
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        logger.error(f"Error fetching booking: {e}")
-        raise HTTPException(status_code=500, detail='Failed to fetch booking')
-
-@router.post('/api/booking/{booking_id}/cancel')
-async def cancel_booking(booking_id: int, db: AsyncSession = Depends(get_db)):
-    """Cancel a booking"""
-    try:
-        async with db.begin():
-            result = await booking_service.cancel_booking(booking_id)
-        if result['success']:
-            return result
-        else:
-            raise HTTPException(status_code=400, detail=result.get('error', 'Failed to cancel booking'))
-            
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        logger.error(f"Error cancelling booking: {e}")
-        raise HTTPException(status_code=500, detail='Failed to cancel booking')

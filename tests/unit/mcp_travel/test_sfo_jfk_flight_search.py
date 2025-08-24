@@ -9,7 +9,7 @@ from unittest.mock import MagicMock
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../'))
 sys.path.insert(0, project_root)
 
-from src.mcp.flight_search_mcp import FlightSearchMCP
+from src.mcp_travel.flight_search_mcp import FlightSearchMCP
 
 class TestSFOJFKFlightSearch(unittest.TestCase):
     """Test cases for SFO to JFK flight search response."""

@@ -144,7 +144,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 50001
 │   └── style.css                      # Custom styling and responsive design
 ├── tests/
 │   └── unit/
-│       └── mcp/                       # Unit tests for MCP modules
+│       └── mcp_travel/               # Unit tests for MCP modules
 ├── pyproject.toml                     # Python project dependencies
 ├── README.md                          # This file
 └── tripbot.db                         # SQLite database file

@@ -3,7 +3,7 @@ import json
 import logging
 import time
 import traceback
-from typing import Dict, Any, Optional
+from typing import Any, Dict, List, Optional, Iterator, Mapping, Union
 from datetime import datetime
 from pydantic import Json
 
@@ -12,12 +12,18 @@ from botocore.exceptions import ClientError, NoCredentialsError
 from typing import Final
 
 # Response dictionary keys
-# TODO: Eventually create a new opackage and move these contanstants and dataformat there.
-# CAUTION: Check prompts language before changing these constantats and values.
+# TODO: Eventually create a new package and move these constants and dataformat there.
+# CAUTION: Check prompts language before changing these constants and values.
 BOT_TEXT_RESPONSE_KEY: Final[str] = "response"
 QUESTION_KEY: Final[str] = "question"
 USER_DATA_KEY: Final[str] = "UserData"
+TOOL_CALL_KEY: Final[str] = "tool_call"
 
+# Import logging configuration
+from tripbot.config.logging_config import setup_logging
+
+# Initialize logging
+setup_logging()
 logger = logging.getLogger(__name__)
 
 class LLMAdapter:
@@ -95,7 +101,7 @@ class BedrockLlamaAdapter(LLMAdapter):
                 # Get a fresh client for this request
                 client = self._get_client()
                 if not client:
-                    return "I'm having trouble connecting to the AI service. Please try again later."
+                     return {BOT_TEXT_RESPONSE_KEY: "I'm having trouble connecting to the AI service. Please try again later."}
                 
                 # Log the request with timing
                 start_time = time.time()
@@ -150,12 +156,211 @@ class BedrockLlamaAdapter(LLMAdapter):
             result.append({"cachePoint": cachePoint})
         return result
 
-class BedrockLlamaResponseParser:
+from langchain_core.callbacks.manager import CallbackManagerForLLMRun
+from langchain_core.outputs import GenerationChunk
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.load import dumps
+from langchain_core.runnables import RunnableSequence
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+
+class BedrockLangChainLlamaAdapter(LLMAdapter):
+    """LangChain style adapter for AWS Bedrock's Llama models with | operator support."""
+
+    def __init__(self, model_id: str = "meta.llama3-70b-instruct-v1:0", temperature: float = 0.7):
+        self.model_id = model_id
+        self.temperature = temperature
+        self.client = None
+        logger.info(f"Initialized BedrockLangChainLlamaAdapter with model: {model_id}")
+    
+    def _get_client(self):
+        """Get or create a Bedrock client."""
+        logging.getLogger('botocore').setLevel(logging.DEBUG)
+        logging.getLogger('boto3').setLevel(logging.ERROR)
+        logging.getLogger('urllib3').setLevel(logging.ERROR)
+        if self.client is None:
+            try:
+                session = boto3.Session()
+                self.client = session.client('bedrock-runtime')
+            except Exception as e:
+                logger.error(f"Error creating Bedrock client: {str(e)}")
+                raise
+        return self.client
+    
+    def build_system_prompt(self, system_prompt: str, guidelines: Optional[str] = None, 
+                          response_format: Optional[dict] = None) -> Any:
+        """Build a system prompt with optional guidelines and response format."""
+        prompt_parts = [system_prompt]
+        
+        if guidelines:
+            prompt_parts.append(f"\nGuidelines:\n{guidelines}")
+            
+        if response_format:
+            format_str = json.dumps(response_format, indent=2)
+            prompt_parts.append(f"Respond ONLY in JSON.Fill UserData if avaialble in JSON.\n{format_str}")
+            
+        return "\n".join(prompt_parts)
+    
+    def generate_response(self, messages: List[Dict[str, Any]], system_prompt: Any = None, 
+                        output_parser: Optional[Any] = None, return_raw: bool = False):
+        """
+        Generate response using AWS Bedrock Llama models with raw response access.
+        
+        Args:
+            messages: List of message dictionaries with 'role' and 'content' keys
+            system_prompt: Optional system prompt or list of system messages
+            output_parser: Optional output parser to process the response
+            return_raw: If True, returns the raw response object with metadata
+            
+        Returns:
+            dict: Response containing text and metadata if return_raw=True,
+                  otherwise returns formatted response
+        """
+        try:
+            # Convert messages to LangChain format
+            langchain_messages = []
+            
+            # Add system prompt if provided
+            if system_prompt:
+                if isinstance(system_prompt, (str, dict)):
+                    langchain_messages.append(SystemMessage(content=system_prompt))
+                elif isinstance(system_prompt, list):
+                    for item in system_prompt:
+                        if isinstance(item, dict) and 'text' in item:
+                            langchain_messages.append(SystemMessage(content=item['text']))
+            
+            # Add conversation messages
+            for msg in messages:
+                role = msg.get('role', '').lower()
+                content = msg.get('content', '')
+                
+                if role == 'user':
+                    langchain_messages.append(HumanMessage(content=content))
+                elif role == 'assistant':
+                    langchain_messages.append(AIMessage(content=content))
+                elif role == 'tool':
+                    langchain_messages.append(ToolMessage(
+                        content=content, 
+                        tool_call_id=msg.get('tool_call_id', '')
+                    ))
+            
+            # Create prompt and chain
+            prompt = ChatPromptTemplate.from_messages(langchain_messages)
+            logger.debug(f"Going ahead with prompt:\n{dumps(prompt, pretty=True)}")
+            
+            # Create the LLM with callback for raw response
+            from langchain_core.callbacks.base import BaseCallbackHandler
+            
+            class RawResponseCallback(BaseCallbackHandler):
+                def __init__(self):
+                    super().__init__()
+                    self.raw_response = None
+                    self.metadata = {}
+                
+                def on_llm_end(self, response, **kwargs):
+                    self.raw_response = response
+                    logger.debug(f"Raw response: {json.dumps(response, indent=2)[:50000]}")
+                    self.metadata.update({
+                        'model_name': getattr(response, 'model_name', None),
+                        'token_usage': getattr(response, 'usage', {})
+                    })
+            
+            # Initialize callback
+            callback = RawResponseCallback()
+            
+            # Configure the LLM with our callback
+            llm = self._create_langchain_llm().with_config({
+                'callbacks': [callback]
+            })
+            
+            # Create and invoke the chain
+            chain = prompt | llm
+            if output_parser:
+                chain = chain | output_parser
+            else:
+                from langchain_core.output_parsers import StrOutputParser
+                chain = chain | StrOutputParser()
+            
+            start_time = time.time()
+            response = chain.invoke({})
+            elapsed = time.time() - start_time
+            logger.debug(f"LLM processing completed in {elapsed:.2f} seconds")
+            
+            # Return raw response if requested
+            if return_raw:
+                return {
+                    'raw_response': callback.raw_response,
+                    'metadata': {
+                        **callback.metadata,
+                        'processing_time_seconds': elapsed,
+                        'model_id': self.model_id,
+                        'temperature': self.temperature
+                    },
+                    'parsed_response': response if output_parser else None
+                }
+            
+            # Return parsed response if parser provided
+            if output_parser:
+                return response
+                
+            # Default return format
+            return {
+                BOT_TEXT_RESPONSE_KEY: response,
+                USER_DATA_KEY: {},
+                QUESTION_KEY: None,
+                'metadata': {
+                    'processing_time_seconds': elapsed,
+                    'model_id': self.model_id
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Error in generate_response: {str(e)}", exc_info=True)
+            return {
+                BOT_TEXT_RESPONSE_KEY: f"I encountered an error: {str(e)}",
+                USER_DATA_KEY: {},
+                QUESTION_KEY: None,
+                'error': str(e),
+                'traceback': traceback.format_exc()
+            }
+    
+    def _create_langchain_llm(self):
+        """Create a LangChain compatible LLM instance."""
+        from langchain_aws import BedrockLLM
+        
+        return BedrockLLM(
+            model_id=self.model_id,
+            client=self._get_client(),
+            model_kwargs={
+                'temperature': self.temperature,
+                'max_tokens':2048,
+                'top_p': 0.9,
+            },
+            streaming=False
+        )
+    
+    def __or__(self, other):
+        """Enable the | operator for chaining with other LangChain components."""
+        if isinstance(other, (ChatPromptTemplate, PromptTemplate)):
+            return RunnableSequence(other, self._create_langchain_llm())
+        return NotImplemented
+
+from langchain_core.output_parsers import BaseOutputParser
+from typing import TypeVar, Any, Dict
+
+class BedrockLlamaResponseParser(BaseOutputParser[Dict[str, Any]]):
     """Class responsible for parsing responses from AWS Bedrock Llama models"""
     
-    def __init__(self):
-        self.logger = logging.getLogger(__name__)
+    @property
+    def _type(self) -> str:
+        return "bedrock_llama_response_parser"
+
+    async def aparse(self, text: str) -> Dict[str, Any]:
+        import anyio
+        return await anyio.to_thread(self.parse, text)
     
+    def parse(self, text: str) -> Dict[str, Any]:
+        return self.parse_response(text)
+
     def extract_bot_format_from_json(self, text):
         """
         Extract and process bot response in the expected format.
@@ -253,11 +458,11 @@ class BedrockLlamaResponseParser:
         Returns:
             dict: Contains 'message' and 'data' keys from the response
         """
-        self.logger.debug(f'Model Latency in ms: {response["metrics"]["latencyMs"]}')
-        self.logger.debug(f'Response stop reason {response["stopReason"]}')
-        self.logger.debug(f'Usage metrics total tokens: {response["usage"]["totalTokens"]}')
-        self.logger.debug(f'Usage metrics input tokens: {response["usage"].get("inputTokens")}')
-        self.logger.debug(f'Usage metrics output tokens: {response["usage"].get("outputTokens")}')
+        logger.debug(f'Model Latency in ms: {response["metrics"]["latencyMs"]}')
+        logger.debug(f'Response stop reason {response["stopReason"]}')
+        logger.debug(f'Usage metrics total tokens: {response["usage"]["totalTokens"]}')
+        logger.debug(f'Usage metrics input tokens: {response["usage"].get("inputTokens")}')
+        logger.debug(f'Usage metrics output tokens: {response["usage"].get("outputTokens")}')
         
         result = {}
         
@@ -289,17 +494,13 @@ class BedrockLlamaResponseParser:
                         self.logger.debug(f"Json Decode error {str(e)}")
                         result[BOT_TEXT_RESPONSE_KEY] = text
 
-                if('tool_call' in content_block and content_block['tool_call']):
-                    result["tool_call"] = content_block['tool_call']
-                if('parameters' in content_block and content_block['parameters']):
+                if TOOL_CALL_KEY in content_block and content_block[TOOL_CALL_KEY]:
+                    result[TOOL_CALL_KEY] = content_block[TOOL_CALL_KEY]
+                if 'parameters' in content_block and content_block['parameters']:
                     result["parameters"] = content_block['parameters']
         
         return result
 
 
-# Export the constants that might be used by other modules
-__all__ = ['LLMAdapter', 'BedrockLlamaAdapter', 'BedrockLlamaResponseParser', 
-           'BOT_TEXT_RESPONSE_KEY', 'QUESTION_KEY', 'USER_DATA_KEY']
-
-
-
+__all__ = ['LLMAdapter', 'BedrockLlamaAdapter', 'BedrockLangChainLlamaAdapter', 
+           'BedrockLlamaResponseParser', 'BOT_TEXT_RESPONSE_KEY', 'QUESTION_KEY', 'USER_DATA_KEY', 'TOOL_CALL_KEY']

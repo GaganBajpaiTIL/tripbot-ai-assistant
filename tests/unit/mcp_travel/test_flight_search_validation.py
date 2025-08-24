@@ -8,7 +8,7 @@ import os
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
 sys.path.insert(0, project_root)
 
-from src.mcp.flight_search_mcp import FlightSearchMCP, is_valid_date_format, validate_return_date
+from src.mcp_travel.flight_search_mcp import FlightSearchMCP, is_valid_date_format, validate_return_date
 
 
 class TestFlightSearchValidation(unittest.TestCase):

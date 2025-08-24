@@ -48,7 +48,7 @@ def setup_logging(default_level=logging.INFO):
                 "level": "DEBUG",
                 "propagate": False
             },
-            "mcp": {
+            "mcp_travel": {
                 "handlers": ["stdout", "stderr"],
                 "level": "DEBUG",
                 "propagate": False
@@ -97,12 +97,12 @@ def setup_logging(default_level=logging.INFO):
     if os.getenv("ENVIRONMENT") != "PRODUCTION":
         logging.getLogger().setLevel(logging.DEBUG)
         logging.getLogger("tripbot").setLevel(logging.DEBUG)
-        logging.getLogger("mcp").setLevel(logging.DEBUG)
+        logging.getLogger("mcp_travel").setLevel(logging.DEBUG)
         logging.getLogger("aiosqlite").setLevel(logging.WARNING)
     else:
         logging.getLogger().setLevel(logging.INFO)
         logging.getLogger("tripbot").setLevel(logging.INFO)
-        logging.getLogger("mcp").setLevel(logging.INFO)
+        logging.getLogger("mcp_travel").setLevel(logging.INFO)
 
 # Call setup_logging when this module is imported
 setup_logging()

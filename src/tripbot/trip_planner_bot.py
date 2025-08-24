@@ -6,14 +6,19 @@ import json
 import logging
 from typing import Any, Dict, List, Optional
 
+from sqlalchemy import false, true
+
 # Import adapters and constants
 from llm_adapters import (
     BedrockLlamaAdapter,
     BedrockLlamaResponseParser,
+    BedrockLangChainLlamaAdapter,
     BOT_TEXT_RESPONSE_KEY,
     QUESTION_KEY,
-    USER_DATA_KEY
+    USER_DATA_KEY,
+    TOOL_CALL_KEY
 )
+from mcp_travel.mcp_utils import parseDate
 
 logger = logging.getLogger(__name__)
 
@@ -25,28 +30,23 @@ class TripPlannerBot:
         self.openai_adapter = None
         self.gemini_adapter = None
         self.bedrock_adapter = None
+        self.bedrock_lang_chain_adapter = None
         
         # Initialize only the requested adapter
         if self.preferred_llm == "bedrock":
             self.bedrock_adapter = BedrockLlamaAdapter()
             self.response_parser = BedrockLlamaResponseParser()
+        elif self.preferred_llm == "bedrock_chain":
+            self.bedrock_lang_chain_adapter = BedrockLangChainLlamaAdapter()
         else:
             raise ValueError(f"Unsupported LLM provider: {preferred_llm}")
         
         # Conversation flow steps
         self.conversation_steps = [
             "greeting",
-            "name_collection",
-            "email_collection", 
-            "destination_collection",
-            "departure_location_collection",
-            "date_collection",
             "flight_search",
-            "travelers_count_collection",
-            "trip_type_collection",
-            "budget_collection",
-            "preferences_collection",
-            "confirmation",
+            "name_collection",
+            "email_collection",
             "booking_confirmation",
             "payment_collection",
             "final_confirmation"
@@ -64,7 +64,7 @@ class TripPlannerBot:
             BOT_TEXT_RESPONSE_KEY: "",
             QUESTION_KEY: "",
             USER_DATA_KEY: "",
-            "tool_call": "",
+            TOOL_CALL_KEY: "",
             "parameters": []
         }
 
@@ -86,6 +86,8 @@ class TripPlannerBot:
             return self.gemini_adapter
         elif self.preferred_llm == "openai":
             return self.openai_adapter
+        elif self.preferred_llm == "bedrock_chain":
+            return self.bedrock_lang_chain_adapter
         else:
             raise ValueError(f"Unsupported LLM provider: {self.preferred_llm}")
 
@@ -162,10 +164,7 @@ class TripPlannerBot:
         merged[USER_DATA_KEY] = collected_data
         logger.debug(f"Merged bot response format: {merged}")
 
-        if not self.isGreetingPrompt(collected_data, messages):
-            bot_format_preamble = "Fill the following JSON\n\n"
-        else:
-            bot_format_preamble = f"Respond in follwoing JSON and fill the remaining {USER_DATA_KEY}\n\n"
+        bot_format_preamble = f"Respond in JSON and fill {USER_DATA_KEY}\n\n"
         bot_format_preamble += json.dumps(merged, indent=2)
         return bot_format_preamble
         
@@ -248,9 +247,11 @@ class TripPlannerBot:
             bool: True if greeting prompt should be used.
         """
         #TODO: Have a counter in collected data, instead of time stamp. Evaluate that. 
-        if not collected_data:
-            return len(messages) < 2
-            
+        if len(messages) < 2:
+            if messages[0]['role'] == 'user' and len(messages[0]['content'].split()) < 4:
+                return True
+            # message has more than 4 words? possibly a quick instruction. User is a bit terse. 
+            return False
         # Check if all non-timestamp keys are empty
         for key, value in collected_data.items():
             if key != 'timestamp' and value:
@@ -287,6 +288,7 @@ class TripPlannerBot:
         Returns:
             bool: True if all required flight search fields are present and non-empty, False otherwise
         """
+        #TODO: Manage return journey ?
         required_fields = ['destination', 'departure_location', 'travel_dates']
         return all(collected_data.get(field, '').strip() for field in required_fields)
 
@@ -315,11 +317,17 @@ class TripPlannerBot:
                     continue
             # For non-string values, just check they're not None (already handled)
             # Always update if the key doesn't exist or if the current value is empty/None
-            if key not in collected_data or not collected_data[key]:
-                collected_data[key] = value
-            # Special handling for timestamp - always update if provided
+            if key not in collected_data or not collected_data[key]: 
+                if 'date' in key.lower():
+                    # Handle date field
+                    #TODO: Set up observer on collected_data
+                    collected_data[key] = parseDate(value)
+                else:
+                    collected_data[key] = value
+            # Special handling for timestamp - always update to current one.
             if key == 'timestamp':
-                collected_data[key] = value
+                collected_data[key] = datetime.now().isoformat()
+            
 
     def _determine_next_step(self, current_step: str, user_message: str, collected_data: dict) -> str:
         """Determine the next conversation step based on current state and user input"""

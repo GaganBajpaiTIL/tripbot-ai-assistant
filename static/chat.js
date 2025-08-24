@@ -90,7 +90,7 @@ class TripBotChat {
             if (data.question) {
                 this.addMessage(`Question: ${data.question}`, 'bot');
             }
-            
+                      
             // Update conversation state
             this.currentStep = data.current_step;
             this.collectedData = data.collected_data || {};
@@ -102,6 +102,9 @@ class TripBotChat {
             // Handle additional data (cost breakdown, booking confirmation)
             if (data.additional_data) {
                 this.handleAdditionalData(data.additional_data);
+            }
+            if(data.tool_call && data.tool_call === "flight_search"){
+                this.addFlightSearchWidget(data.collectedData);
             }
             
         } catch (error) {
@@ -324,6 +327,260 @@ class TripBotChat {
             this.addMessage(errorMessage, 'bot');
         }
     }
+    //TODO: Move to a separate file. 
+    addFlightSearchWidget(collectedData) {
+        // Create a message container for the widget
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bot-message';
+        
+        // Set a unique ID for this widget instance
+        const widgetId = 'flight-widget-' + Date.now();
+        messageDiv.id = widgetId;
+        
+        // Add the widget HTML structure
+        messageDiv.innerHTML = `
+            <div class="message-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble">
+                    <div id="${widgetId}-content">
+                        <div class="text-center py-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 mb-0">Loading flight search...</p>
+                        </div>
+                    </div>
+                </div>
+                <small class="message-time text-muted">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>
+            </div>
+        `;
+        
+        // Add the message to the chat
+        this.chatMessages.appendChild(messageDiv);
+        this.scrollToBottom();
+        
+        // Load the flight search widget template
+        fetch('/templates/flight_search_widget.html')
+            .then(response => response.text())
+            .then(html => {
+                // Inject the widget HTML
+                const widgetContent = document.getElementById(`${widgetId}-content`);
+                widgetContent.innerHTML = html;
+                
+                // Set default values from collectedData if available
+                if (collectedData) {
+                    if (collectedData.origin) document.getElementById('flightFrom').value = collectedData.origin;
+                    if (collectedData.destination) document.getElementById('flightTo').value = collectedData.destination;
+                    if (collectedData.departureDate) document.getElementById('departureDate').value = collectedData.departureDate;
+                    if (collectedData.returnDate) document.getElementById('returnDate').value = collectedData.returnDate;
+                }
+                
+                // Set minimum date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('departureDate').min = today;
+                document.getElementById('returnDate').min = today;
+                
+                // Add event listeners
+                this.setupFlightSearchWidget(widgetId, collectedData);
+            })
+            .catch(error => {
+                console.error('Error loading flight search widget:', error);
+                const widgetContent = document.getElementById(`${widgetId}-content`);
+                widgetContent.innerHTML = '<div class="alert alert-danger">Failed to load flight search. Please try again later.</div>';
+            });
+    }
+    
+    setupFlightSearchWidget(widgetId, collectedData) {
+        const widget = document.getElementById(widgetId);
+        const searchForm = widget.querySelector('.flight-search-form');
+        const resultsDiv = widget.querySelector('.flight-results');
+        const flightsList = widget.querySelector('#flightsList');
+        const searchBtn = widget.querySelector('#searchFlightsBtn');
+        const backBtn = widget.querySelector('#backToSearch');
+        const selectBtn = widget.querySelector('#selectFlightBtn');
+        
+        let selectedFlight = null;
+        
+        // Toggle between search form and results
+        const showResults = (show) => {
+            searchForm.style.display = show ? 'none' : 'block';
+            resultsDiv.style.display = show ? 'block' : 'none';
+        };
+        
+        // Handle flight search
+        searchBtn.addEventListener('click', async () => {
+            const from = widget.querySelector('#flightFrom').value.trim();
+            const to = widget.querySelector('#flightTo').value.trim();
+            const departureDate = widget.querySelector('#departureDate').value;
+            const returnDate = widget.querySelector('#returnDate').value;
+            const passengers = widget.querySelector('#passengers').value;
+            const cabinClass = widget.querySelector('#cabinClass').value;
+            
+            if (!from || !to || !departureDate) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            try {
+                // Show loading state
+                flightsList.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Searching flights...</span>
+                        </div>
+                        <p class="mt-2 mb-0">Searching for flights...</p>
+                    </div>
+                `;
+                
+                showResults(true);
+                
+                // Call the flight search API
+                const response = await fetch('/api/search_flights', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        origin: from,
+                        destination: to,
+                        departure_date: departureDate,
+                        return_date: returnDate || null,
+                        passengers: parseInt(passengers),
+                        cabin_class: cabinClass,
+                        ...collectedData // Include any additional collected data
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to search for flights');
+                }
+                
+                const data = await response.json();
+                
+                if (!data.flights || data.flights.length === 0) {
+                    flightsList.innerHTML = `
+                        <div class="alert alert-warning mb-0">
+                            No flights found for the selected criteria. Please try different search parameters.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Display flight results
+                flightsList.innerHTML = data.flights.map((flight, index) => {
+                    const departureTime = new Date(flight.departure_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const arrivalTime = new Date(flight.arrival_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const duration = `${Math.floor(flight.duration / 60)}h ${flight.duration % 60}m`;
+                    
+                    return `
+                        <div class="card mb-2 flight-option ${selectedFlight === index ? 'border-primary' : ''}" 
+                             data-index="${index}" 
+                             style="cursor: pointer;">
+                            <div class="card-body p-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold">${flight.airline} ${flight.flight_number}</div>
+                                        <div class="small text-muted">${flight.aircraft || 'Aircraft not specified'}</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">$${flight.price.toFixed(2)}</div>
+                                        <div class="small text-muted">${flight.stops} ${flight.stops === 1 ? 'stop' : 'stops'}</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div>
+                                        <div class="fw-bold">${departureTime}</div>
+                                        <div class="small">${flight.origin}</div>
+                                    </div>
+                                    <div class="text-center px-2" style="flex-grow: 1;">
+                                        <div class="flight-route">
+                                            <div class="flight-route-line"></div>
+                                            <div class="flight-route-duration small">${duration}</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">${arrivalTime}</div>
+                                        <div class="small">${flight.destination}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add click handlers for flight selection
+                document.querySelectorAll('.flight-option').forEach((card, index) => {
+                    card.addEventListener('click', () => {
+                        // Update selected state
+                        document.querySelectorAll('.flight-option').forEach(c => c.classList.remove('border-primary'));
+                        card.classList.add('border-primary');
+                        selectedFlight = index;
+                        selectBtn.disabled = false;
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error searching flights:', error);
+                flightsList.innerHTML = `
+                    <div class="alert alert-danger mb-0">
+                        An error occurred while searching for flights. Please try again later.
+                    </div>
+                `;
+            }
+        });
+        
+        // Back button handler
+        backBtn.addEventListener('click', () => {
+            showResults(false);
+            selectedFlight = null;
+            selectBtn.disabled = true;
+        });
+        
+        // Select flight handler
+        selectBtn.addEventListener('click', () => {
+            if (selectedFlight === null) return;
+            
+            // Get the selected flight data (in a real app, this would be the actual flight data)
+            const flightData = {
+                selected: true,
+                flightIndex: selectedFlight,
+                // Add any other relevant flight data here
+            };
+            
+            // Send the selected flight as a message
+            this.sendFlightSelection(flightData, widgetId);
+            
+            // Disable the widget
+            widget.querySelectorAll('input, button, select').forEach(el => el.disabled = true);
+            selectBtn.innerHTML = '<i class="fas fa-check me-1"></i> Flight Selected';
+            selectBtn.classList.remove('btn-primary');
+            selectBtn.classList.add('btn-success');
+            selectBtn.disabled = true;
+        });
+    }
+    
+    sendFlightSelection(flightData, widgetId) {
+        // In a real implementation, you would format the flight data as a message
+        // and send it to the chat API
+        const message = `I've selected flight #${flightData.flightIndex + 1}`;
+        this.addMessage(message, 'user');
+        
+        // You would typically call your chat API here with the flight selection
+        // Example:
+        /*
+        fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: message,
+                flightSelection: flightData,
+                // Include any other context needed
+            })
+        });
+        */
+    }
 }
 
 // Global functions
@@ -359,4 +616,3 @@ window.addEventListener('unhandledrejection', (event) => {
     console.error('Unhandled promise rejection:', event.reason);
     event.preventDefault();
 });
-
