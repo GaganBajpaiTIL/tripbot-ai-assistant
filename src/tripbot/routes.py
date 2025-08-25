@@ -104,7 +104,7 @@ async def chat(
         db.add(chat_session)
         await db.commit()
         await db.refresh(chat_session)
-        
+    
     # Get conversation history
     conversation_history = chat_session.conversation_state.get('messages', [])
     if(conversation_history):
@@ -114,7 +114,7 @@ async def chat(
         user_message,
         conversation_history,
         chat_session.current_step,
-        json.loads(chat_session.collected_data) if chat_session.collected_data else {}
+        json.loads(chat_session.collected_data) if chat_session.collected_data and isinstance(chat_session.collected_data, str) else (chat_session.collected_data if chat_session.collected_data else {})
     )
         
     # Extract and store relevant data from user message
