@@ -12,6 +12,7 @@ from starlette.staticfiles import StaticFiles
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from pydantic import BaseModel
+from datetime import datetime
 
 # Add project root to path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))

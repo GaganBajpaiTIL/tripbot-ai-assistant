@@ -49,9 +49,12 @@ class TripBotChat {
         this.messageInput.style.height = this.messageInput.scrollHeight + 'px';
     }
     
-    async sendMessage() {
-        const message = this.messageInput.value.trim();
-        if (!message || this.isTyping) return;
+    async sendMessage(message) {
+        if(message ==null){
+            const user_message = this.messageInput.value.trim();
+            if (!user_message || this.isTyping) return;
+            message = user_message;
+        }
         
         // Add user message to chat
         this.addMessage(message, 'user');
@@ -70,6 +73,7 @@ class TripBotChat {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'x-session-id': sessionStorage.getItem('sessionId') || '',
                 },
                 body: JSON.stringify({ message })
             });
@@ -77,7 +81,11 @@ class TripBotChat {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+            // After getting the response, check for and store the session ID
+            const sessionId = response.headers.get('x-session-id');
+            if (sessionId) {
+                sessionStorage.setItem('sessionId', sessionId);
+            }
             const data = await response.json();
             
             // Hide typing indicator
@@ -103,8 +111,8 @@ class TripBotChat {
             if (data.additional_data) {
                 this.handleAdditionalData(data.additional_data);
             }
-            if(data.tool_call && data.tool_call === "flight_search"){
-                this.addFlightSearchWidget(data.collectedData);
+            if(data.tool_call && data.tool_call === "search_flight"){
+                this.addFlightSearchWidget(data.collected_data);
             }
             
         } catch (error) {
@@ -229,7 +237,7 @@ class TripBotChat {
     formatFieldLabel(key) {
         const labels = {
             'traveler_name': 'UserName',
-            'traveler_email': 'Email',
+            'email': 'Email',
             'destination': 'Destination',
             'departure_location': 'Departure',
             'departure_date': 'Departure Date',
@@ -371,10 +379,10 @@ class TripBotChat {
                 
                 // Set default values from collectedData if available
                 if (collectedData) {
-                    if (collectedData.origin) document.getElementById('flightFrom').value = collectedData.origin;
+                    if (collectedData.departure_location) document.getElementById('flightFrom').value = collectedData.departure_location;
                     if (collectedData.destination) document.getElementById('flightTo').value = collectedData.destination;
-                    if (collectedData.departureDate) document.getElementById('departureDate').value = collectedData.departureDate;
-                    if (collectedData.returnDate) document.getElementById('returnDate').value = collectedData.returnDate;
+                    if (collectedData.departure_date) document.getElementById('departureDate').value = collectedData.departure_date;
+                    if (collectedData.return_date) document.getElementById('returnDate').value = collectedData.return_date;
                 }
                 
                 // Set minimum date to today
@@ -437,10 +445,10 @@ class TripBotChat {
                 showResults(true);
                 
                 // Call the flight search API
-                const response = await fetch('/api/search_flights', {
+                const response = await fetch('/api/travel/search_flights', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         origin: from,
@@ -448,8 +456,9 @@ class TripBotChat {
                         departure_date: departureDate,
                         return_date: returnDate || null,
                         passengers: parseInt(passengers),
-                        cabin_class: cabinClass,
-                        ...collectedData // Include any additional collected data
+                        travel_class: cabinClass
+
+
                     })
                 });
                 
@@ -459,7 +468,7 @@ class TripBotChat {
                 
                 const data = await response.json();
                 
-                if (!data.flights || data.flights.length === 0) {
+                if (!data.flights_results || data.flights_results.length === 0) {
                     flightsList.innerHTML = `
                         <div class="alert alert-warning mb-0">
                             No flights found for the selected criteria. Please try different search parameters.
@@ -469,7 +478,7 @@ class TripBotChat {
                 }
                 
                 // Display flight results
-                flightsList.innerHTML = data.flights.map((flight, index) => {
+                flightsList.innerHTML = data.flights_results.map((flight, index) => {
                     const departureTime = new Date(flight.departure_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     const arrivalTime = new Date(flight.arrival_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     const duration = `${Math.floor(flight.duration / 60)}h ${flight.duration % 60}m`;
@@ -478,6 +487,7 @@ class TripBotChat {
                         <div class="card mb-2 flight-option ${selectedFlight === index ? 'border-primary' : ''}" 
                              data-index="${index}" 
                              style="cursor: pointer;">
+                             <input type="hidden" id="flight-raw-data-${index}" class="flight-raw-data" value='${JSON.stringify(flight.raw).replace(/'/g, "&apos;")}'>
                             <div class="card-body p-2">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
@@ -485,14 +495,14 @@ class TripBotChat {
                                         <div class="small text-muted">${flight.aircraft || 'Aircraft not specified'}</div>
                                     </div>
                                     <div class="text-end">
-                                        <div class="fw-bold">$${flight.price.toFixed(2)}</div>
+                                        <div class="fw-bold">₹${flight.price.toFixed(2)}</div>
                                         <div class="small text-muted">${flight.stops} ${flight.stops === 1 ? 'stop' : 'stops'}</div>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mt-2">
                                     <div>
                                         <div class="fw-bold">${departureTime}</div>
-                                        <div class="small">${flight.origin}</div>
+                                        <div class="small">${flight.arrival_airport}</div>
                                     </div>
                                     <div class="text-center px-2" style="flex-grow: 1;">
                                         <div class="flight-route">
@@ -502,10 +512,11 @@ class TripBotChat {
                                     </div>
                                     <div class="text-end">
                                         <div class="fw-bold">${arrivalTime}</div>
-                                        <div class="small">${flight.destination}</div>
+                                        <div class="small">${flight.departure_airport}</div>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     `;
                 }).join('');
@@ -513,9 +524,14 @@ class TripBotChat {
                 // Add click handlers for flight selection
                 document.querySelectorAll('.flight-option').forEach((card, index) => {
                     card.addEventListener('click', () => {
-                        // Update selected state
-                        document.querySelectorAll('.flight-option').forEach(c => c.classList.remove('border-primary'));
-                        card.classList.add('border-primary');
+                        // Remove selection from all cards
+                        document.querySelectorAll('.flight-option').forEach(c => {
+                            c.classList.remove('border-primary');
+                            c.style.border = '1px solid #dee2e6'; // Reset to default border
+                        });
+                        
+                        // Add red border to selected card
+                        card.style.border = '2px solid #dc3545';
                         selectedFlight = index;
                         selectBtn.disabled = false;
                     });
@@ -546,6 +562,7 @@ class TripBotChat {
             const flightData = {
                 selected: true,
                 flightIndex: selectedFlight,
+                raw_search_data: encodeURIComponent(JSON.stringify(JSON.parse(document.getElementById(`flight-raw-data-${selectedFlight}`).value)))
                 // Add any other relevant flight data here
             };
             
@@ -562,24 +579,144 @@ class TripBotChat {
     }
     
     sendFlightSelection(flightData, widgetId) {
-        // In a real implementation, you would format the flight data as a message
-        // and send it to the chat API
-        const message = `I've selected flight #${flightData.flightIndex + 1}`;
-        this.addMessage(message, 'user');
-        
-        // You would typically call your chat API here with the flight selection
-        // Example:
-        /*
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                message: message,
-                flightSelection: flightData,
-                // Include any other context needed
-            })
+        // Hide the flight selection widget
+        const widget = document.getElementById(widgetId);
+        widget.style.display = 'none';
+    
+        // Create booking form
+        const bookingForm = document.createElement('div');
+        bookingForm.className = 'booking-form p-3 bg-light rounded mb-3';
+        bookingForm.innerHTML = `
+            <h5 class="mb-3 text-dark">Complete Your Booking</h5>
+            <form id="bookingForm">
+                <input type="hidden" name="flight_raw_data" value='${flightData.raw_search_data}'/>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark">Full Name</label>
+                    <input type="text" class="form-control" name="user_name" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark">Email</label>
+                    <input type="email" class="form-control" name="user_email" required>
+                </div>
+                
+                <div id="passengerContainer" class="mb-3">
+                    <!-- Passengers will be added here -->
+                </div>
+                
+                <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="addPassenger">
+                    <i class="fas fa-plus me-1"></i> Add Passenger
+                </button>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check me-1"></i> Confirm Booking
+                    </button>
+                </div>
+            </form>
+        `;
+    
+        // Insert after the widget
+        widget.parentNode.insertBefore(bookingForm, widget.nextSibling);
+    
+        // Add first passenger field
+        this.addPassengerField();
+    
+        // Add passenger button handler
+        document.getElementById('addPassenger').addEventListener('click', () => {
+            this.addPassengerField();
         });
-        */
+    
+        // Form submission handler
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const passengers = [];
+            
+            // Collect passenger data
+            document.querySelectorAll('.passenger-row').forEach((row, index) => {
+                passengers.push({
+                    type: row.querySelector('.passenger-type').value,
+                    firstName: row.querySelector('.first-name').value,
+                    lastName: row.querySelector('.last-name').value,
+                    dob: row.querySelector('.dob').value,
+                    gender: row.querySelector('.gender').value,
+                    passport: row.querySelector('.passport').value
+                });
+            });
+    
+            const bookingData = {
+                user_name: formData.get('user_name'),
+                user_email: formData.get('user_email'),
+                flight_raw_data: formData.get('flight_raw_data'),
+                passengers: passengers
+            };
+    
+            try {
+                const response = await fetch('/api/travel/book_flight', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+    
+                const result = await response.json();
+                
+                if (response.ok) {
+                    this.addMessage(`Your flight has been booked! PNR: ${result.pnr}`, 'assistant',false);
+                    // You might want to show booking details here
+                } else {
+                    throw new Error(result.message || 'Failed to book flight');
+                }
+            } catch (error) {
+                console.error('Booking error:', error);
+                this.addMessage(`Sorry, we couldn't process your booking. Please try again.`,'assistant',true);
+            }
+        });
+    }
+    
+    addPassengerField() {
+        const container = document.getElementById('passengerContainer');
+        const passengerCount = container.querySelectorAll('.passenger-row').length + 1;
+        
+        const passengerDiv = document.createElement('div');
+        passengerDiv.className = 'passenger-row border p-3 mb-3 rounded';
+        passengerDiv.innerHTML = `
+            <h6>Passenger ${passengerCount}</h6>
+            <div class="row g-2">
+                <div class="col-md-2">
+                    <select class="form-select passenger-type" required>
+                        <option value="ADT">Adult</option>
+                        <option value="CHD">Child</option>
+                        <option value="INF">Infant</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control first-name" placeholder="First Name" required>
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control last-name" placeholder="Last Name" required>
+                </div>
+                <div class="col-md-4">
+                    <input type="date" class="form-control dob" required>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select gender" required>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                        <option value="O">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control passport" placeholder="Passport Number" required>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(passengerDiv);
     }
 }
 

@@ -1,6 +1,6 @@
 from tripbot.database import Base
 from sqlalchemy import Column, Integer, String, Float, Date, DateTime, JSON
-from datetime import datetime
+from datetime import datetime,timezone
 
 class TripBooking(Base):
     """Model for storing trip bookings"""
@@ -19,8 +19,8 @@ class TripBooking(Base):
     booking_status = Column(String(50), default="confirmed")
     total_amount = Column(Float, nullable=True)
     payment_status = Column(String(50), default="pending")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     def to_dict(self):
         """Convert booking to dictionary for JSON serialization"""
@@ -50,8 +50,8 @@ class ChatSession(Base):
     conversation_state = Column(JSON, nullable=True)  # Store conversation state as JSON
     current_step = Column(String(50), default="greeting")
     collected_data = Column(JSON, nullable=True)  # Store collected trip data
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     def to_dict(self):
         """Convert session to dictionary for JSON serialization"""

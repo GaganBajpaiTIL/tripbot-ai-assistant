@@ -418,6 +418,46 @@ class FlightSearchMCP:
         if travel_class.upper() not in VALID_TRAVEL_CLASSES:
             raise ValueError(f"Travel class must be one of {', '.join(VALID_TRAVEL_CLASSES)}")
 
+    def get_iata_code(self, keyword, country_code=None, max_results=1):
+        """
+        Searches for airports/cities based on a keyword and retrieves their IATA codes.
+
+        Args:
+            keyword (str): The search term for the city or airport.
+            country_code (str, optional): An optional ISO 3166 alpha-2 country code to filter results.
+            max_results (int, optional): The maximum number of results to return. Defaults to 1.
+
+        Returns:
+            list: A list of dictionaries, where each dictionary contains 'name' and 'iataCode'
+                for matching airports/cities, or an empty list if no results are found.
+        """
+        try:
+            params = {
+                'keyword':keyword,
+                'subType':'AIRPORT,CITY',  # Search for both airports and cities
+                'countryCode':country_code,
+            }
+            response = call_with_retry(
+                self.client.reference_data.locations.get,
+                **params
+            )
+
+
+            iata_codes = []
+            if response.data:
+                for item in response.data:
+                    iata_codes.append({
+                        'name': item['name'],
+                        'iataCode': item['iataCode']
+                    })
+            return iata_codes
+
+        except ResponseError as error:
+            logger.error(f"Error getting IATA code: {error}")
+            return []
+
+
+
 def is_valid_date_format(date_str) -> bool:
     """Validate the date format is YYYY-MM-DD.
     

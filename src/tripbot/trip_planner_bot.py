@@ -5,7 +5,7 @@ import os
 import json
 import logging
 from typing import Any, Dict, List, Optional
-
+from datetime import datetime
 from sqlalchemy import false, true
 
 # Import adapters and constants
@@ -16,7 +16,8 @@ from llm_adapters import (
     BOT_TEXT_RESPONSE_KEY,
     QUESTION_KEY,
     USER_DATA_KEY,
-    TOOL_CALL_KEY
+    TOOL_CALL_KEY,
+    TOOL_PARAMETERS_KEY
 )
 from mcp_travel.mcp_utils import parseDate
 
@@ -46,10 +47,10 @@ class TripPlannerBot:
             "greeting",
             "flight_search",
             "name_collection",
-            "email_collection",
-            "booking_confirmation",
-            "payment_collection",
-            "final_confirmation"
+            "email_collection"
+            # "booking_confirmation",
+            # "payment_collection",
+            # "final_confirmation"
         ]
         # Load prompts from files
         self.prompts_dir = os.path.join(os.path.dirname(__file__), "prompts")
@@ -65,7 +66,7 @@ class TripPlannerBot:
             QUESTION_KEY: "",
             USER_DATA_KEY: "",
             TOOL_CALL_KEY: "",
-            "parameters": []
+            TOOL_PARAMETERS_KEY: []
         }
 
     def _load_prompt(self, filename: str) -> str:
@@ -111,12 +112,13 @@ class TripPlannerBot:
         
         # build adapter specific prompt
         adapter_system_prompt = adapter.build_system_prompt(context_prompt, self.guideLines, bot_response_format)
-        
+        logger.debug(f"calling generate with following prompt {adapter_system_prompt} and message {messages}")
         # Get response from the LLM with tool support
         response = adapter.generate_response(messages, adapter_system_prompt)
-        
+        logger.debug(f"Response from LLM: {response}")
         # Extract response elements
         response_elements = self.extract_response_elements(response)
+        logger.debug(f"Response elements: {response_elements}")
         
         # Update collected data if any new data is provided in the response
         if USER_DATA_KEY in response_elements and response_elements[USER_DATA_KEY]:
@@ -336,6 +338,8 @@ class TripPlannerBot:
             return self.conversation_steps[0]  # Start from the beginning
             
         current_index = self.conversation_steps.index(current_step)
+        # if(_is_flight_search_result_available(collected_data)):
+        #     return self.conversation_steps[current_index + 1]
         
         # Basic logic: move to next step unless we're at the end
         if current_index < len(self.conversation_steps) - 1:
@@ -346,7 +350,7 @@ class TripPlannerBot:
 def main():
     """Run the TripBot in command line mode"""
     import asyncio
-    from datetime import datetime
+   
     
     # Set up logging
     logging.basicConfig(

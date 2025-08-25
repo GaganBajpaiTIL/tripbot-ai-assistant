@@ -1,11 +1,14 @@
 import uuid
 from pathlib import Path
-
+import json
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
+from datetime import datetime
+from typing import Dict, Any, Optional
+from sqlalchemy import select
 
 # Import logging configuration
 from tripbot.config.logging_config import setup_logging
@@ -18,7 +21,7 @@ logger = logging.getLogger(__name__)
 # Local imports
 from database import get_db
 from models import ChatSession
-from llm_adapters import BOT_TEXT_RESPONSE_KEY, QUESTION_KEY, USER_DATA_KEY
+from llm_adapters import BOT_TEXT_RESPONSE_KEY, QUESTION_KEY, USER_DATA_KEY,TOOL_CALL_KEY,TOOL_PARAMETERS_KEY
 from trip_planner_bot import TripPlannerBot
 from mcp_travel.flight_search_mcp import FlightSearchMCP
 from booking_service import BookingService
@@ -43,17 +46,16 @@ class ChatResponse(BaseModel):
 @router.get('/')
 async def index(request: Request):
     """Main chat interface"""
-    response = templates.TemplateResponse("index.html", {"request": request})
-    # Set session ID in response headers if not already present
-    if not request.headers.get('x-session-id'):
-        session_id = str(uuid.uuid4())
-        response.headers['x-session-id'] = session_id
-        logger.info(f"Set new session ID in response: {session_id}")
+    response = templates.TemplateResponse(
+        request=request,
+        name="index.html"
+    )
+ 
     return response
 
 @router.get('/templates/flight_search_widget.html')
 async def flight_search_widget(request: Request):
-    return templates.TemplateResponse("flight_search_widget.html", {"request": request})
+    return templates.TemplateResponse(request,"flight_search_widget.html")
 
 @router.post('/api/chat', response_model=ChatResponse)
 async def chat(
@@ -73,22 +75,26 @@ async def chat(
         session_id = str(uuid.uuid4())
         logger.info(f"Generated new session ID: {session_id}")
         
-    # Get or create chat session
-    chat_session = await db.get(ChatSession, session_id)
+    # Query the session by session_id (which is not the primary key)
+    result = await db.execute(
+        select(ChatSession).where(ChatSession.session_id == session_id)
+    )
+    chat_session = result.scalar_one_or_none()
     #TODO: Set up observer on collected_data
     if not chat_session:
         logger.info(f"Creating new chat session for session ID: {session_id}")
         chat_session = ChatSession(
             session_id=session_id,
-            conversation_state={'messages': []},
+            conversation_state={"messages": []},
             current_step='greeting',
               collected_data = {
                 'timestamp': datetime.now().isoformat(),
-                'UserName': "",
+                'traveler_name': "",
                 'email': "",
                 'destination': "",
                 'departure_location': "",
-                'dates': "",
+                'departure_date': "",
+                'return_date':"",
                 'travelers_count': "",
                 'trip_type': "",
                 'budget': "",
@@ -101,20 +107,21 @@ async def chat(
         
     # Get conversation history
     conversation_history = chat_session.conversation_state.get('messages', [])
-
+    if(conversation_history):
+        conversation_history = json.loads(conversation_history)
     # Generate bot response
     bot_response, next_step, collected_data =  trip_bot.generate_response(
         user_message,
         conversation_history,
         chat_session.current_step,
-        chat_session.collected_data or {}
+        json.loads(chat_session.collected_data) if chat_session.collected_data else {}
     )
         
     # Extract and store relevant data from user message
     updated_data = extract_data_from_message(
         user_message, 
         chat_session.current_step, 
-        chat_session.collected_data or {}
+        collected_data
     )
         
         
@@ -123,9 +130,9 @@ async def chat(
     conversation_history.append({'role': 'assistant', 'content': bot_response})
         
     # Update chat session
-    chat_session.conversation_state = {'messages': conversation_history}
+    chat_session.conversation_state = {'messages': json.dumps(conversation_history)}
     chat_session.current_step = next_step
-    chat_session.collected_data = updated_data
+    chat_session.collected_data = json.dumps(collected_data)
     await db.commit()
     await db.refresh(chat_session)
         
@@ -142,25 +149,44 @@ async def chat(
                 payment_result = await booking_service.process_payment(booking.id, {})
                 additional_data['booking'] = booking.to_dict()
                 additional_data['payment'] = payment_result
-        
+    additional_data = {}
+    if next_step == 'booking_confirmation':
+        # Calculate trip cost
+        cost_breakdown = await booking_service.calculate_trip_cost(updated_data)
+        additional_data['cost_breakdown'] = cost_breakdown
+    elif next_step == 'final_confirmation':
+        # Create booking and process payment
+            booking = await booking_service.create_booking(updated_data)
+            if booking:
+                payment_result = await booking_service.process_payment(booking.id, {})
+                additional_data['booking'] = booking.to_dict()
+                additional_data['payment'] = payment_result
+    
+    # Check if we should trigger flight search
+    tool_call = bot_response.get(TOOL_CALL_KEY, "")
+    if ('search' in tool_call and 'flight' in tool_call) or 'search_flight' in tool_call:
+        if(validate_flight_search_parameters(updated_data)):
+            tool_call = "search_flight"
+        else:
+            tool_call = "collect_flight_search_parameters"  
     response_data = {
         'response': bot_response.get(BOT_TEXT_RESPONSE_KEY, ""),
         'current_step': next_step,
-        'collected_data': updated_data,
-        'additional_data': additional_data
+        'collected_data': collected_data,
+        'additional_data': additional_data,
+        'tool_call': tool_call,
+        'tool_parameters': bot_response.get(TOOL_PARAMETERS_KEY, {})
     }
     
     # Only add question if it exists in bot_response
     if QUESTION_KEY in bot_response:
         response_data[QUESTION_KEY] = bot_response[QUESTION_KEY]
         
-    # Only add tool_call and tool_parameters if tool_call exists in bot_response
-    if "tool_call" in bot_response:
-        response_data['tool_call'] = bot_response["tool_call"]
-        if "tool_parameters" in bot_response:
-            response_data['tool_parameters'] = bot_response["tool_parameters"]
+    #Create JSONResponse with the session ID in headers
+    response = JSONResponse(content=response_data)
+    response.headers['x-session-id'] = session_id
     
-    return JSONResponse(response_data)
+    return response
         
 @router.post('/api/reset')
 def reset_session():
@@ -242,3 +268,45 @@ def extract_data_from_message(message: str, current_step: str, existing_data: di
         logger.error(f"Error extracting data from message: {e}")
     
     return data
+
+def validate_flight_search_parameters(collected_data: dict) -> bool:
+    """
+    Validate if all required flight search parameters are present in the collected data.
+    
+    Args:
+        collected_data: Dictionary containing collected user data
+        
+    Returns:
+        bool: True if all required parameters are present and valid, False otherwise
+    """
+    required_fields = {
+        'destination': str,
+        'departure_location': str,
+        'departure_date': str
+    }
+    
+    # Check if all required fields are present and non-empty
+    for field, field_type in required_fields.items():
+        value = collected_data.get(field)
+        if not value or not str(value).strip():
+            return False
+            
+    # Validate travel dates format (YYYY-MM-DD or YYYY-MM-DD to YYYY-MM-DD)
+    travel_dates = collected_data['departure_date'].strip()
+    date_parts = travel_dates.split(' to ')
+    
+    if len(date_parts) == 1:  # Single date
+        try:
+            datetime.strptime(date_parts[0], '%Y-%m-%d')
+        except ValueError:
+            return False
+    elif len(date_parts) == 2:  # Date range
+        try:
+            datetime.strptime(date_parts[0].strip(), '%Y-%m-%d')
+            datetime.strptime(date_parts[1].strip(), '%Y-%m-%d')
+        except (ValueError, IndexError):
+            return False
+    else:
+        return False
+        
+    return True

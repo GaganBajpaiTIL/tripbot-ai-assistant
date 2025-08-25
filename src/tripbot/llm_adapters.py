@@ -18,6 +18,7 @@ BOT_TEXT_RESPONSE_KEY: Final[str] = "response"
 QUESTION_KEY: Final[str] = "question"
 USER_DATA_KEY: Final[str] = "UserData"
 TOOL_CALL_KEY: Final[str] = "tool_call"
+TOOL_PARAMETERS_KEY: Final[str] = "parameters"
 
 # Import logging configuration
 from tripbot.config.logging_config import setup_logging
@@ -442,10 +443,10 @@ class BedrockLlamaResponseParser(BaseOutputParser[Dict[str, Any]]):
             return result
             
         except json.JSONDecodeError as e:
-            self.logger.warning(f"Failed to parse JSON from response: {e}")
+            logger.warning(f"Failed to parse JSON from response: {e}")
             return {BOT_TEXT_RESPONSE_KEY: text}
         except Exception as e:
-            self.logger.error(f"Unexpected error parsing response: {e}")
+            logger.error(f"Unexpected error parsing response: {e}")
             return {BOT_TEXT_RESPONSE_KEY: text}
     
     def parse_response(self, response) -> dict:
@@ -503,4 +504,4 @@ class BedrockLlamaResponseParser(BaseOutputParser[Dict[str, Any]]):
 
 
 __all__ = ['LLMAdapter', 'BedrockLlamaAdapter', 'BedrockLangChainLlamaAdapter', 
-           'BedrockLlamaResponseParser', 'BOT_TEXT_RESPONSE_KEY', 'QUESTION_KEY', 'USER_DATA_KEY', 'TOOL_CALL_KEY']
+           'BedrockLlamaResponseParser', 'BOT_TEXT_RESPONSE_KEY', 'QUESTION_KEY', 'USER_DATA_KEY', 'TOOL_CALL_KEY',TOOL_PARAMETERS_KEY]
